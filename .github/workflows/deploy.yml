@@ -17,7 +17,7 @@ jobs:
         with:
           host: home.meyssam.ir
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           source: "kubernetes/*"
           target: "~/deployment"
@@ -27,7 +27,7 @@ jobs:
         with:
           host: home.meyssam.ir
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             cd ~/deployment/kubernetes
