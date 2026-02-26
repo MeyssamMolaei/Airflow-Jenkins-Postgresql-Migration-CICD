@@ -19,7 +19,7 @@ def bulk_generate_p1_data(host="localhost", count=100):
             user="postgres",
             password="p1password",  # As defined in postgres-p1.yaml
             host=host,
-            port="5433",
+            port="5432",
             database="source_db"
         )
         cursor = connection.cursor()
