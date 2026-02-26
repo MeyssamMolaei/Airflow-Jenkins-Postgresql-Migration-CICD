@@ -31,7 +31,7 @@ jobs:
           port: 22
           script: |
             cd ~/deployment/kubernetes
-            kubectl apply -f postgres-p1.yaml
-            kubectl apply -f postgres-p2.yaml
-            kubectl apply -f airflow.yaml
-            kubectl apply -f jenkins.yaml
+            kubectl --insecure-skip-tls-verify=true apply -f postgres-p1.yaml
+            kubectl --insecure-skip-tls-verify=true apply -f postgres-p2.yaml
+            kubectl --insecure-skip-tls-verify=true apply -f airflow.yaml
+            kubectl --insecure-skip-tls-verify=true apply -f jenkins.yaml
