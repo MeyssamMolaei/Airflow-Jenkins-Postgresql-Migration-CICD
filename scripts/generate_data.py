@@ -8,7 +8,7 @@ def generate_random_name():
     last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"]
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
-def bulk_generate_p1_data(host="home.meyssam.ir", count=100000, port="30433"):
+def bulk_generate_p1_data(host="home.meyssam.ir", count=100000, port="30432"):
     """
     Connects to Postgres P1 and inserts random employee data.
     Now defaults to the external NodePort.
