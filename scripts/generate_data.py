@@ -56,6 +56,7 @@ def bulk_generate_p1_data(host="localhost", count=100):
             connection.close()
 
 if __name__ == "__main__":
-    # Default to localhost (assuming port-forward) or pass IP from command line
-    target_host = sys.argv[1] if len(sys.argv) > 1 else "localhost"
+    # If running on the Ubuntu server, it can often resolve 'postgres-p1' via K8s DNS 
+    # or you can pass the specific IP/Service Name as an argument.
+    target_host = sys.argv[1] if len(sys.argv) > 1 else "postgres-p1"
     bulk_generate_p1_data(host=target_host, count=100)
