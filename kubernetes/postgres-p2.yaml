@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-p2
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres-p2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-p2
+spec:
+  selector:
+    matchLabels:
+      app: postgres-p2
+  template:
+    metadata:
+      labels:
+        app: postgres-p2
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "p2password"
+            - name: POSTGRES_DB
+              value: "target_db"
+          ports:
+            - containerPort: 5432
