@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "kubernetes/*"
+          source: "kubernetes/*, scripts/*"
           target: "~/deployment"
 
       - name: Apply Kubernetes manifests
