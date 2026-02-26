@@ -47,7 +47,7 @@ spec:
             - name: POSTGRES_DB
               value: "source_db"
           ports:
-            - containerPort: 5432
+            - containerPort: 5433
           volumeMounts:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d

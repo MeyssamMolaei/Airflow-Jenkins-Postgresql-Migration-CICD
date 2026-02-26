@@ -30,4 +30,4 @@ spec:
             - name: POSTGRES_DB
               value: "target_db"
           ports:
-            - containerPort: 5432
+            - containerPort: 5434
