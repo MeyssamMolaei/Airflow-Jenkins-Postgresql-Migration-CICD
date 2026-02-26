@@ -4,14 +4,18 @@ metadata:
   name: jenkins
 spec:
   type: NodePort
-  ports:
-    - port: 8080
-      targetPort: 8080
-      nodePort: 30090
-    - port: 50000
-      targetPort: 50000
   selector:
     app: jenkins
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30090
+      protocol: TCP
+    - name: agent
+      port: 50000
+      targetPort: 50000
+      protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,8 +34,12 @@ spec:
         - name: jenkins
           image: jenkins/jenkins:lts
           ports:
-            - containerPort: 8080
-            - containerPort: 50000
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: agent
+              containerPort: 50000
+              protocol: TCP
           env:
             - name: JAVA_OPTS
               value: "-Djenkins.install.runSetupWizard=false"
