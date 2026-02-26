@@ -20,8 +20,11 @@ kind: Service
 metadata:
   name: postgres-p1
 spec:
+  type: NodePort
   ports:
     - port: 5432
+      targetPort: 5432
+      nodePort: 30433 # External access on 30433, mapping to 5433 is usually done via firewall/host NAT
   selector:
     app: postgres-p1
 ---

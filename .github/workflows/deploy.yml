@@ -30,6 +30,14 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
+            echo "🧹 Cleaning up existing resources..."
+            # Delete non-default resources in the current namespace
+            kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true
+            
+            # Wait a moment for cleanup to finish
+            sleep 5
+            
+            echo "🚀 Deploying new manifests..."
             cd ~/deployment/kubernetes
             kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p1.yaml
             kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p2.yaml
