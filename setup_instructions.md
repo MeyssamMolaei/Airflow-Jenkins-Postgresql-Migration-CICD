@@ -4,7 +4,7 @@ To get this automation running, follow these steps:
 
 ## 1. GitHub Secrets
 In your GitHub repository, go to **Settings > Secrets and variables > Actions** and add the following:
-- `SSH_PRIVATE_KEY`: Your private SSH key to access `home.meyssam.ir`.
+- `SSH_KEY`: Your private SSH key to access `home.meyssam.ir`. (Used in GitHub Actions)
 - `SSH_USERNAME`: Your SSH username (e.g., `root` or `meyssam`).
 
 ## 2. Jenkins Credentials
@@ -19,5 +19,26 @@ Once Jenkins is up at `http://home.meyssam.ir:30090`:
 ## 3. Airflow Connection Setup
 The DAG expects connections named `postgres_p1` and `postgres_p2`. These are pre-configured via environment variables in `airflow.yaml`.
 
-## 4. Deployment
-Simply push your changes to the `main` branch. GitHub Actions will handle the Kubernetes deployment to your Ubuntu server.
+## 4. Bulk Data Generation (P1)
+To test the migration, you need data in the source database. I've provided two ways to do this in the `scripts/` folder:
+
+### Option A: Bash (Inside Server)
+If you are logged into the Ubuntu host, run:
+```bash
+bash scripts/generate_data.sh
+```
+This uses `kubectl exec` to push data directly into the pod.
+
+### Option B: Python (Remote)
+If you want to run it from your local machine, first port-forward the service:
+```bash
+kubectl port-forward svc/postgres-p1 5432:5432
+```
+Then run the script (requires `pip install psycopg2-binary`):
+```bash
+python scripts/generate_data.py
+```
+
+## 5. Deployment
+Simply push your changes to the `main` branch. GitHub Actions will handle the Kubernetes deployment.
+> **Note**: Deployment now uses `--insecure-skip-tls-verify=true` as per your updates.
