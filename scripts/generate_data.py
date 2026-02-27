@@ -8,7 +8,7 @@ def generate_random_name():
     last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"]
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
-def bulk_generate_p1_data(host="home.meyssam.ir", count=100000, port="30432"):
+def bulk_generate_p1_data(host="home.meyssam.ir", count=100, port="30432"):
     """
     Connects to Postgres P1 and inserts random employee data.
     Now defaults to the external NodePort.
@@ -58,4 +58,4 @@ if __name__ == "__main__":
     # If running on the Ubuntu server, it can often resolve 'postgres-p1' via K8s DNS 
     # or you can pass the specific IP/Service Name as an argument.
     target_host = sys.argv[1] if len(sys.argv) > 1 else "postgres-p1"
-    bulk_generate_p1_data(host=target_host, count=100000)
+    bulk_generate_p1_data(host=target_host, count=100)
