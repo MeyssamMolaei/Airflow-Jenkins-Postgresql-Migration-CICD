@@ -29,10 +29,12 @@ spec:
     app: postgres-p1
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres-p1
 spec:
+  serviceName: "postgres-p1"
+  replicas: 1
   selector:
     matchLabels:
       app: postgres-p1

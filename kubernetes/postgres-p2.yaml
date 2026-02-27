@@ -12,10 +12,12 @@ spec:
     app: postgres-p2
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres-p2
 spec:
+  serviceName: "postgres-p2"
+  replicas: 1
   selector:
     matchLabels:
       app: postgres-p2

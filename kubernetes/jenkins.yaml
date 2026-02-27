@@ -18,10 +18,12 @@ spec:
       protocol: TCP
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: jenkins
 spec:
+  serviceName: "jenkins"
+  replicas: 1
   selector:
     matchLabels:
       app: jenkins
