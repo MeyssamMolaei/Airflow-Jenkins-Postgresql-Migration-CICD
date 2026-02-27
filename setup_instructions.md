@@ -30,19 +30,21 @@ bash scripts/generate_data.sh
 This uses `kubectl exec` to push data directly into the pod.
 
 ### Option B: Python (On Ubuntu Server)
-To run the Python script directly on the server, use either the Service Name or the Cluster IP. Note that when using the Cluster IP, you must use port **5432**.
+To run the Python script directly on the server, you may need to install the dependencies first. Since the script now defaults to the service name `postgres-p1`, you can run it like this:
 
 ```bash
-# Using Service Name (Best)
-python3 scripts/generate_data.py postgres-p1 5432
+# Install dependencies if needed
+sudo apt update && sudo apt install -y python3-pip
+pip3 install psycopg2-binary
 
-# Using Cluster IP (from kubectl get svc)
-python3 scripts/generate_data.py 10.43.166.83 5432
-
-# Using External/NodePort (from outside the cluster)
-python3 scripts/generate_data.py home.meyssam.ir 30433
+# Run the script (it will try to connect to 'postgres-p1')
+# If the server is outside the K8s network, you may need to use the Service ClusterIP or NodeIP
+python3 scripts/generate_data.py
 ```
 
 ## 5. Deployment
-Simply push your changes to the `main` branch. GitHub Actions will handle the Kubernetes deployment.
-> **Note**: Deployment now uses `--insecure-skip-tls-verify=true` as per your updates.
+Simply push your changes to the `main` branch. GitHub Actions will handle:
+1. Copying Kubernetes manifests, scripts, and **Airflow DAGs** to the server.
+2. Applying the manifests.
+
+> **Note**: Airflow now loads DAGs directly from the server's filesystem (`/home/deploy/deployment/airflow/dags`) using a `hostPath` volume. This makes it easier to add new DAGs without manual Kubernetes changes.

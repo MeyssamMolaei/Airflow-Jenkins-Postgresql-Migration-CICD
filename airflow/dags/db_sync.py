@@ -29,11 +29,11 @@ def sync_data():
     """)
     
     # Simple sync: Delete all and re-insert
-    dest_cursor.execute("DELETE FROM employees")
+    # dest_cursor.execute("DELETE FROM employees")
     
     for row in rows:
         dest_cursor.execute(
-            "INSERT INTO employees (id, name, department, salary) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO employees (id, name, department, salary) VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, department=EXCLUDED.department, salary=EXCLUDED.salary",
             row
         )
 
