@@ -41,5 +41,5 @@ jobs:
             cd ~/deployment/kubernetes
             kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p1.yaml
             kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p2.yaml
-            kubectl --validate=false --insecure-skip-tls-verify=true apply -f airflow.yaml
             kubectl --validate=false --insecure-skip-tls-verify=true apply -f jenkins.yaml
+            kubectl --validate=false --insecure-skip-tls-verify=true apply -f airflow.yaml
