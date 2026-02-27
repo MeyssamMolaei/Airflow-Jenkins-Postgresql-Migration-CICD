@@ -52,6 +52,28 @@ spec:
               value: "postgresql://postgres:p2password@postgres-p2:5432/target_db"
             - name: AIRFLOW__API__AUTH_BACKENDS
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+            # CPU Optimization Settings
+            - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
+              value: "30" # Parse DAGs every 30s instead of every 1s
+            - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
+              value: "60" # Check for new files every 60s
+            - name: AIRFLOW__CORE__PARALLELISM
+              value: "4"  # Limit concurrent tasks
+            - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
+              value: "2"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m" # Max 1 core of the 2 available
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
           ports:
             - containerPort: 8080
           volumeMounts:
