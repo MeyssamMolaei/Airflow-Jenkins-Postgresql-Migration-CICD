@@ -29,8 +29,21 @@ spec:
       containers:
         - name: airflow
           image: apache/airflow:latest
-          command: ["airflow", "standalone"]
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              airflow db init
+              airflow users create \
+                --username madmin \
+                --password "$AIRFLOW_WWW_USER_PASSWORD" \
+                --firstname Meyssam \
+                --lastname Molaye \
+                --role Admin \
+                --email [EMAIL_ADDRESS]
+              airflow standalone
           env:
+            - name: AIRFLOW_WWW_USER_PASSWORD
+              value: "!!Anaconda@1981##" # Change this to your desired password
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
