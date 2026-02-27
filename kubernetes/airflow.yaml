@@ -12,10 +12,12 @@ spec:
     app: airflow
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: airflow
 spec:
+  serviceName: "airflow"
+  replicas: 1
   selector:
     matchLabels:
       app: airflow

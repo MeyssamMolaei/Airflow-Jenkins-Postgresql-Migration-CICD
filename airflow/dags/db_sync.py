@@ -56,7 +56,7 @@ with DAG(
     'postgres_sync_p1_to_p2',
     default_args=default_args,
     description='Sync employees table from P1 to P2',
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
 ) as dag:
 
