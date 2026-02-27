@@ -31,11 +31,19 @@ def sync_data():
     # Simple sync: Delete all and re-insert
     # dest_cursor.execute("DELETE FROM employees")
     
-    for row in rows:
-        dest_cursor.execute(
-            "INSERT INTO employees (id, name, department, salary) VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, department=EXCLUDED.department, salary=EXCLUDED.salary",
-            row
-        )
+    # Batch Insertion (Much faster and lower CPU)
+    from psycopg2.extras import execute_values
+    
+    insert_query = """
+        INSERT INTO employees (id, name, department, salary) 
+        VALUES %s 
+        ON CONFLICT (id) DO UPDATE SET 
+        name=EXCLUDED.name, 
+        department=EXCLUDED.department, 
+        salary=EXCLUDED.salary
+    """
+    
+    execute_values(dest_cursor, insert_query, rows)
 
     dest_conn.commit()
     
