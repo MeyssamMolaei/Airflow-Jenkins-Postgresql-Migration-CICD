@@ -18,7 +18,7 @@ jobs:
           host: home.meyssam.ir
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: 22
+          port: ${{ secrets.SSH_PORT }}
           source: "kubernetes/*, scripts/*, airflow/dags/*"
           target: "~/deployment"
 
@@ -28,7 +28,7 @@ jobs:
           host: home.meyssam.ir
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: 22
+          port: ${{ secrets.SSH_PORT }}
           script: |
             echo "🧹 Cleaning up existing resources..."
             # Delete non-default resources in the current namespace
