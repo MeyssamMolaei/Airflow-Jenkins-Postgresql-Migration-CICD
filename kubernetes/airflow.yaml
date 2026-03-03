@@ -39,7 +39,7 @@ spec:
                 --firstname Meyssam \
                 --lastname Molaye \
                 --role Admin \
-                --email [EMAIL_ADDRESS]
+                --email meyssam.molaye@gmail.com
               airflow standalone
           env:
             - name: AIRFLOW_WWW_USER_PASSWORD
@@ -82,6 +82,6 @@ spec:
       volumes:
         - name: dags-volume
           hostPath:
-            path: /home/deploy/deployment/airflow/dags
+            path: /home/development/deployment/airflow/dags
             type: Directory
 
