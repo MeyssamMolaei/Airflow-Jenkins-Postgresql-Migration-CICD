@@ -29,9 +29,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: |
-            chmod +x ~/deployment/scripts/setup_server.sh
-            ~/deployment/scripts/setup_server.sh
+          # script: |
+          #   chmod +x ~/deployment/scripts/setup_server.sh
+          #   ~/deployment/scripts/setup_server.sh
 
       - name: Apply Kubernetes manifests
         uses: appleboy/ssh-action@master
@@ -43,20 +43,20 @@ jobs:
           script: |
             echo "🧹 Cleaning up existing resources..."
             # Delete non-default resources in the current namespace
-            # kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
+            kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
             
             # Wait a moment for cleanup to finish
-            # sleep 5
+            sleep 5
             
             echo "🚀 Deploying new manifests..."
             cd ~/deployment/kubernetes
             # rm -rf ~/deployment/airflow/dags
-            # mkdir -p ~/deployment/airflow/dags
-            # chown -R development:development ~/deployment/airflow
-            # chmod 755 -R ~/deployment/airflow/dags
-            # kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p1.yaml
-            # kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p2.yaml
-            # sleep 50
-            # kubectl --validate=false --insecure-skip-tls-verify=true apply -f jenkins.yaml
-            # sleep 50
-            # kubectl --validate=false --insecure-skip-tls-verify=true apply -f airflow.yaml
+            mkdir -p ~/deployment/airflow/dags
+            chown -R development:development ~/deployment/airflow
+            chmod 755 -R ~/deployment/airflow/dags
+            kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p1.yaml
+            kubectl --validate=false --insecure-skip-tls-verify=true apply -f postgres-p2.yaml
+            sleep 50
+            kubectl --validate=false --insecure-skip-tls-verify=true apply -f jenkins.yaml
+            sleep 50
+            kubectl --validate=false --insecure-skip-tls-verify=true apply -f airflow.yaml
