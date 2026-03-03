@@ -47,4 +47,4 @@ Simply push your changes to the `main` branch. GitHub Actions will handle:
 1. Copying Kubernetes manifests, scripts, and **Airflow DAGs** to the server.
 2. Applying the manifests.
 
-> **Note**: Airflow now loads DAGs directly from the server's filesystem (`/home/deploy/deployment/airflow/dags`) using a `hostPath` volume. This makes it easier to add new DAGs without manual Kubernetes changes.
+> **Note**: Airflow now loads DAGs directly from the server's filesystem (`/home/development/deployment/airflow/dags`) using a `hostPath` volume. This makes it easier to add new DAGs without manual Kubernetes changes.
