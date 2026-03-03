@@ -11,7 +11,7 @@
 - **Exposed Services**: Postgres instances are exposed via NodePort.
     - **P1 Port**: 30433 (External) / 5432 (Internal)
     - **P2 Port**: 30434 (External) / 5432 (Internal)
-- **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/deploy/deployment/airflow/dags` on the host server.
+- **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/development/deployment/airflow/dags` on the host server.
 
 ### 2. Airflow Configuration & Optimization
 - **Credentials**: Fixed admin account created via custom entrypoint:
