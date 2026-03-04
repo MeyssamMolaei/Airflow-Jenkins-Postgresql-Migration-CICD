@@ -33,24 +33,17 @@ spec:
           args:
             - |
               airflow db init
-              # Create user or reset password to ensure it stays static as defined in the Secret
               airflow users create \
                 --username madmin \
                 --password "$AIRFLOW_WWW_USER_PASSWORD" \
                 --firstname Meyssam \
                 --lastname Molaye \
                 --role Admin \
-                --email meyssam.molaye@gmail.com || \
-              airflow users reset-password \
-                --username madmin \
-                --password "$AIRFLOW_WWW_USER_PASSWORD"
+                --email meyssam.molaye@gmail.com
               airflow standalone
           env:
             - name: AIRFLOW_WWW_USER_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: airflow-secrets
-                  key: AIRFLOW_WWW_USER_PASSWORD
+              value: "hRM3ra4vHy9Uy78c" # Change this to your desired password
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
@@ -61,20 +54,20 @@ spec:
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
             # CPU Optimization Settings
             - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
-              value: "30" # Parse DAGs every 30s instead of every 1s
+              value: "3000" # Parse DAGs every 30s instead of every 1s
             - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
-              value: "60" # Check for new files every 60s
+              value: "5" # Check for new files every 60s
             - name: AIRFLOW__CORE__PARALLELISM
-              value: "4"  # Limit concurrent tasks
+              value: "1"  # Limit concurrent tasks
             - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
-              value: "2"
+              value: "1"
           resources:
             requests:
               memory: "1Gi"
               cpu: "500m"
             limits:
-              memory: "2Gi"
-              cpu: "1000m" # Max 1 core of the 2 available
+              memory: "1Gi"
+              cpu: "500m" # Max 1 core of the 2 available
           livenessProbe:
             httpGet:
               path: /health
