@@ -2,7 +2,6 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime, timedelta
-
 def sync_data():
     # Source (P1) connection
     src_hook = PostgresHook(postgres_conn_id='postgres_p1')

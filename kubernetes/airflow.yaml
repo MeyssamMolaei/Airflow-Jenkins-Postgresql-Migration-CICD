@@ -33,17 +33,24 @@ spec:
           args:
             - |
               airflow db init
+              # Create user or reset password to ensure it stays static as defined in the Secret
               airflow users create \
                 --username madmin \
                 --password "$AIRFLOW_WWW_USER_PASSWORD" \
                 --firstname Meyssam \
                 --lastname Molaye \
                 --role Admin \
-                --email meyssam.molaye@gmail.com
+                --email meyssam.molaye@gmail.com || \
+              airflow users reset-password \
+                --username madmin \
+                --password "$AIRFLOW_WWW_USER_PASSWORD"
               airflow standalone
           env:
             - name: AIRFLOW_WWW_USER_PASSWORD
-              value: "!!Anaconda@1981##" # Change this to your desired password
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-secrets
+                  key: AIRFLOW_WWW_USER_PASSWORD
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
