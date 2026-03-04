@@ -43,7 +43,6 @@ jobs:
           script: |
             echo "🧹 Cleaning up existing resources..."
             # Delete non-default resources in the current namespace
-            kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
             
             # Wait a moment for cleanup to finish
             sleep 5
@@ -52,5 +51,5 @@ jobs:
             cd ~/deployment/kubernetes
             export KUBECONFIG=/home/development/.kube/config
             kubectl get nodes
-            kubectl delete deploy,svc,pod,cm,pvc,sts --all --ignore-not-found=true -A
-            kubectl apply -f ~/deployment/kubernetes
+            kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
+            kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes
