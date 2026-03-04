@@ -61,6 +61,8 @@ spec:
               value: "4"
             - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
               value: "2"
+            - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS
+              value: "True"
           resources:
             requests:
               memory: "1Gi"
@@ -70,10 +72,10 @@ spec:
               cpu: "1000m"
           livenessProbe:
             httpGet:
-              path: /health
+              path: /api/v2/version
               port: 8080
             initialDelaySeconds: 60
-            periodSeconds: 30
+            periodSeconds: 300
           ports:
             - containerPort: 8080
           volumeMounts:
