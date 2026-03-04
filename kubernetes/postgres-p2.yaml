@@ -30,8 +30,8 @@ spec:
         - name: postgres
           image: postgres:latest
           env:
-            - name: POSTGRES_PASSWORD
-              value: "p2password"
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: "trust"
             - name: POSTGRES_DB
               value: "target_db"
           ports:

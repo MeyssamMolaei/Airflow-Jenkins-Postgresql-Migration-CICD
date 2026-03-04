@@ -47,27 +47,27 @@ spec:
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
-              value: "postgresql://postgres:p1password@postgres-p1:5432/source_db"
+              value: "postgresql://postgres@postgres-p1:5432/source_db"
             - name: AIRFLOW_CONN_POSTGRES_P2
-              value: "postgresql://postgres:p2password@postgres-p2:5432/target_db"
+              value: "postgresql://postgres@postgres-p2:5432/target_db"
             - name: AIRFLOW__API__AUTH_BACKENDS
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
             # CPU Optimization Settings
             - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
-              value: "3000" # Parse DAGs every 30s instead of every 1s
+              value: "30" # Parse DAGs every 30s
             - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
-              value: "5" # Check for new files every 60s
+              value: "30" 
             - name: AIRFLOW__CORE__PARALLELISM
-              value: "1"  # Limit concurrent tasks
+              value: "4"
             - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
-              value: "1"
+              value: "2"
           resources:
             requests:
               memory: "1Gi"
               cpu: "500m"
             limits:
-              memory: "1Gi"
-              cpu: "500m" # Max 1 core of the 2 available
+              memory: "2Gi"
+              cpu: "1000m"
           livenessProbe:
             httpGet:
               path: /health

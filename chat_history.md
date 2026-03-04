@@ -31,14 +31,25 @@
     - Fixed `kubectl` flags for insecure TLS and validation skip.
 - **Data Generation**: Created `scripts/generate_data.py` to populate P1 with random data via either internal ClusterIP or external NodePort.
 
+### 4. Recent Infrastructure Updates
+- **Server Setup Automation**: Created `scripts/setup_server.sh` to automate the installation of Python, K3s, and K9s on fresh Ubuntu 24.04 nodes.
+- **User Migration**: Migrated the entire deployment from the `deploy` user to the `development` user, including SSH configurations and `hostPath` volume paths.
+- **Postgres Authentication**: Disabled authentication for `postgres-p1` and `postgres-p2` using `POSTGRES_HOST_AUTH_METHOD: trust` to simplify internal communication and fix connection issues.
+- **Airflow Stability**:
+    - Configured resource requests/limits (500m-1000m CPU, 1Gi-2Gi RAM).
+    - Optimized scheduler intervals (`MIN_FILE_PROCESS_INTERVAL: 30`) to reduce CPU overhead.
+    - Updated connection strings to passwordless format.
+- **Diagnostics**: Created `scripts/debug_k8s.sh` to collect pod logs and analyze cluster events for troubleshooting.
+
 ## 🔑 Crucial Connections
-- **Postgres P1 (Internal)**: `postgresql://postgres:p1password@postgres-p1:5432/source_db`
-- **Postgres P2 (Internal)**: `postgresql://postgres:p2password@postgres-p2:5432/target_db`
-- **Airflow Web UI**: `http://home.meyssam.ir:30080`
+- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db` (Trust Auth)
+- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db` (Trust Auth)
+- **Airflow Web UI**: `http://home.meyssam.ir:30080` (User: `madmin`)
 - **Jenkins Web UI**: `http://home.meyssam.ir:30090`
 
 ## 📝 Recent Files Modified
-- `kubernetes/airflow.yaml`: StatefulSet, CPU optimizations, and user creation.
-- `airflow/dags/db_sync.py`: Batch sync logic using `psycopg2.extras`.
-- `.github/workflows/deploy.yml`: Cleanup and SCP folder sync.
-- `scripts/generate_data.py`: Multipurpose data generation script.
+- `kubernetes/airflow.yaml`: Resource tuning and passwordless connections.
+- `kubernetes/postgres-p1.yaml` & `postgres-p2.yaml`: Enabled `trust` authentication.
+- `.github/workflows/deploy.yml`: Switched to `development` user and added setup/debug support.
+- `scripts/debug_k8s.sh`: New diagnostic tool.
+- `scripts/setup_server.sh`: New server initialization script.
