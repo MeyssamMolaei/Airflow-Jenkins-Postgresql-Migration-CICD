@@ -24,6 +24,15 @@ echo "Token obtained (first 10 chars): ${TOKEN:0:10}..."
 LOGICAL_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 RUN_ID="jenkins_$(date +%s)"
 
+
+RESPONSE=$(curl -X PATCH "${AIRFLOW_URL}/api/v2/dags/postgres_sync_p1_to_p2" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H 'Content-Type: application/json' \
+  -d '{"is_paused": false}')
+
+echo "Unpause DAG response:"
+echo "$RESPONSE"
+ 
 RESPONSE=$(curl -sS -X POST "${AIRFLOW_URL}/api/v2/dags/postgres_sync_p1_to_p2/dagRuns" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H 'Content-Type: application/json' \
