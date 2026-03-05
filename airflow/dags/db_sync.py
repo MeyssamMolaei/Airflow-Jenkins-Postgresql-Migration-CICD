@@ -63,8 +63,9 @@ default_args = {
 with DAG(
     'postgres_sync_p1_to_p2',
     default_args=default_args,
+    start_date=datetime(2025, 1, 1),
     description='Sync employees table from P1 to P2',
-    schedule=None,
+    schedule='@once',
     catchup=False,
 ) as dag:
 
