@@ -12,6 +12,15 @@
     - **P1 Port**: 30433 (External) / 5432 (Internal)
     - **P2 Port**: 30434 (External) / 5432 (Internal)
 - **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/development/deployment/airflow/dags` on the host server.
+## 🛠️ Implementation Summary (Updated)
+
+### 1. Infrastructure & Stability
+- **StatefulSets**: Converted all deployments (Airflow, Jenkins, Postgres P1, Postgres P2) to `StatefulSet`.
+    - **Stable Pod Names**: `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`.
+- **Exposed Services**: Postgres instances are exposed via NodePort.
+    - **P1 Port**: 30433 (External) / 5432 (Internal)
+    - **P2 Port**: 30434 (External) / 5432 (Internal)
+- **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/development/deployment/airflow/dags` on the host server.
 
 ### 2. Airflow Configuration & Optimization
 - **Credentials**: Fixed admin account created via custom entrypoint:
@@ -41,6 +50,18 @@
     - Updated connection strings to passwordless format.
 - **Diagnostics**: Created `scripts/debug_k8s.sh` to collect pod logs and analyze cluster events for troubleshooting.
 
+## 🔑 Crucial Connections
+- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db` (Trust Auth)
+- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db` (Trust Auth)
+- **Airflow Web UI**: `http://home.meyssam.ir:30080` (User: `madmin`)
+- **Jenkins Web UI**: `http://home.meyssam.ir:30090`
+
+## 📝 Recent Files Modified
+- `kubernetes/airflow.yaml`: Resource tuning and passwordless connections.
+- `kubernetes/postgres-p1.yaml` & `postgres-p2.yaml`: Enabled `trust` authentication.
+- `.github/workflows/deploy.yml`: Switched to `development` user and added setup/debug support.
+- `scripts/debug_k8s.sh`: New diagnostic tool.
+- `scripts/setup_server.sh`: New server initialization script.
 ## 🔑 Crucial Connections
 - **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db` (Trust Auth)
 - **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db` (Trust Auth)
