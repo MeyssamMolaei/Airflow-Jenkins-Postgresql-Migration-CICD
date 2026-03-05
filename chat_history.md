@@ -16,7 +16,7 @@
 ### 2. Airflow Configuration & Optimization
 - **Credentials**: Fixed admin account created via custom entrypoint:
     - **User**: `madmin`
-    - **Password**: `REPLACED_PASSWORD`
+    - **Password**: `CHANGE_ME`
 - **CPU Optimization**:
     - Reduced DAG parsing frequency to 30s.
     - Set resource limits to cap Airflow at 1 CPU core (250m request, 1000m limit).
@@ -53,4 +53,3 @@
 - `.github/workflows/deploy.yml`: Switched to `development` user and added setup/debug support.
 - `scripts/debug_k8s.sh`: New diagnostic tool.
 - `scripts/setup_server.sh`: New server initialization script.
-

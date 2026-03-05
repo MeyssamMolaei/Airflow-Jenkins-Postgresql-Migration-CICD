@@ -45,7 +45,7 @@ spec:
             - name: TZ
               value: "Europe/Stockholm"               # ← System/container timezone
             - name: AIRFLOW_WWW_USER_PASSWORD
-              value: "REPLACED_PASSWORD"               # Change this to your desired password
+              value: "CHANGE_ME"               # Change this to your desired password
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
