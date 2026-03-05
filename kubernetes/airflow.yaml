@@ -42,8 +42,10 @@ spec:
                 --email meyssam.molaye@gmail.com
               airflow standalone
           env:
+            - name: TZ
+              value: "Europe/Stockholm"               # ← System/container timezone
             - name: AIRFLOW_WWW_USER_PASSWORD
-              value: "REPLACED_PASSWORD" # Change this to your desired password
+              value: "REPLACED_PASSWORD"               # Change this to your desired password
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
@@ -54,19 +56,17 @@ spec:
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
             # CPU Optimization Settings
             - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
-              value: "1" # Parse DAGs every 30s
+              value: "1"
             - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
-              value: "1" 
+              value: "1"
             - name: AIRFLOW__CORE__PARALLELISM
               value: "2"
             - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
               value: "1"
             - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS
               value: "True"
-            - name: AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE
-              value: "europe/stockholm"
             - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
-              value: "europe/stockholm"
+              value: "Europe/Stockholm"               # ← Core Airflow timezone (scheduling, naive datetimes)
           resources:
             requests:
               memory: "1Gi"
@@ -90,4 +90,3 @@ spec:
           hostPath:
             path: /home/development/deployment/airflow/dags
             type: Directory
-
