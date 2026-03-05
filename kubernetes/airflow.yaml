@@ -54,13 +54,13 @@ spec:
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
             # CPU Optimization Settings
             - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
-              value: "30" # Parse DAGs every 30s
+              value: "1" # Parse DAGs every 30s
             - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
-              value: "30" 
+              value: "1" 
             - name: AIRFLOW__CORE__PARALLELISM
-              value: "4"
-            - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
               value: "2"
+            - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
+              value: "1"
             - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS
               value: "True"
           resources:
