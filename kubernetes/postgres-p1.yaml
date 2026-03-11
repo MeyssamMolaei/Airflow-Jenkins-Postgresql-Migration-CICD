@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-p1-init
+data:
+  init.sql: |
+    CREATE TABLE employees (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        department VARCHAR(100),
+        salary NUMERIC
+    );
+    INSERT INTO employees (name, department, salary) VALUES
+    ('Alice', 'Engineering', 90000),
+    ('Bob', 'Product', 80000),
+    ('Charlie', 'Design', 75000);
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-p1
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 30433 # External access on 30433, mapping to 5433 is usually done via firewall/host NAT
+  selector:
+    app: postgres-p1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-p1
+spec:
+  serviceName: "postgres-p1"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-p1
+  template:
+    metadata:
+      labels:
+        app: postgres-p1
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: "trust"
+            - name: POSTGRES_DB
+              value: "source_db"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-script
+          configMap:
+            name: postgres-p1-init

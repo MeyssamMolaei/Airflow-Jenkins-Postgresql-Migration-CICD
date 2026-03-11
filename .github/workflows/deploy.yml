@@ -1,0 +1,55 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy manifests to server
+        uses: appleboy/scp-action@master
+        with:
+          host: home.meyssam.ir
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "kubernetes/*, scripts/*, airflow/dags/*"
+          target: "~/deployment"
+
+      - name: Setup Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: home.meyssam.ir
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          # script: |
+          #   chmod +x ~/deployment/scripts/setup_server.sh
+          #   ~/deployment/scripts/setup_server.sh
+
+      - name: Apply Kubernetes manifests
+        uses: appleboy/ssh-action@master
+        with:
+          host: home.meyssam.ir
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "🧹 Cleaning up existing resources..."
+            # Delete non-default resources in the current namespace
+            
+            # Wait a moment for cleanup to finish
+            sleep 5
+            
+            echo "🚀 Deploying new manifests..."
+            cd ~/deployment/kubernetes
+            export KUBECONFIG=/home/development/.kube/config
+            kubectl get nodes
+            # kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
+            kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes

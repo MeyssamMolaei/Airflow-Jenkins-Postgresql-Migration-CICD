@@ -1,0 +1,49 @@
+#!/bin/bash -e
+
+AIRFLOW_URL="http://192.168.1.88:30080"
+USER="admin"
+PASS="CHANGE_ME"          # Use Jenkins credential injection instead in production!
+
+# Get token
+RAW_RESPONSE=$(curl -sS -X POST "${AIRFLOW_URL}/auth/token" \
+  -H 'Content-Type: application/json' \
+  -d "{\"username\":\"${USER}\",\"password\":\"${PASS}\"}")
+
+# Extract token with sed (handles quotes and whitespace)
+TOKEN=$(echo "$RAW_RESPONSE" | sed -n 's/.*"access_token": *"\([^"]*\)".*/\1/p')
+
+if [ -z "$TOKEN" ]; then
+  echo "Failed to get token. Raw response:"
+  echo "$RAW_RESPONSE"
+  exit 1
+fi
+
+echo "Token obtained (first 10 chars): ${TOKEN:0:10}..."
+
+# Trigger DAG
+LOGICAL_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+RUN_ID="jenkins_$(date +%s)"
+
+
+RESPONSE=$(curl -X PATCH "${AIRFLOW_URL}/api/v2/dags/postgres_sync_p1_to_p2" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H 'Content-Type: application/json' \
+  -d '{"is_paused": false}')
+
+echo "Unpause DAG response:"
+echo "$RESPONSE"
+ 
+RESPONSE=$(curl -sS -X POST "${AIRFLOW_URL}/api/v2/dags/postgres_sync_p1_to_p2/dagRuns" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H 'Content-Type: application/json' \
+  -d "{\"logical_date\":\"${LOGICAL_DATE}\",\"dag_run_id\":\"${RUN_ID}\",\"conf\":{\"source\":\"jenkins\"}}")
+
+echo "DAG trigger response:"
+echo "$RESPONSE"
+
+if echo "$RESPONSE" | grep -q '"state" *: *"queued"'; then
+  echo "Success: DAG triggered"
+else
+  echo "Failed to trigger DAG"
+  exit 1
+fi
