@@ -15,7 +15,7 @@ def sync_data():
     dest_cursor = dest_conn.cursor()
 
     # Get data from P1
-    src_cursor.execute("SELECT id, name, department, salary FROM employees")
+    src_cursor.execute("SELECT id, name, department, salary, created_at FROM employees")
     rows = src_cursor.fetchall()
 
     # Create table in P2 if it doesn't exist
