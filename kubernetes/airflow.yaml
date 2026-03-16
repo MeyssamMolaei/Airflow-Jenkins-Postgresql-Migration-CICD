@@ -43,20 +43,17 @@ spec:
               airflow standalone
           env:
             - name: TZ
-              value: "Europe/Stockholm"               # ← System/container timezone
+              value: "Europe/Stockholm" 
             - name: AIRFLOW_WWW_USER_PASSWORD
-              value: "CHANGE_ME"               # Change this to your desired password
+              value: "CHANGE_ME" 
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
             - name: AIRFLOW_CONN_POSTGRES_P1
               value: "postgresql://postgres@postgres-p1:5432/source_db"
-              value: "postgresql://postgres@postgres-p1:5432/source_db"
             - name: AIRFLOW_CONN_POSTGRES_P2
-              value: "postgresql://postgres@postgres-p2:5432/target_db"
               value: "postgresql://postgres@postgres-p2:5432/target_db"
             - name: AIRFLOW__API__AUTH_BACKENDS
               value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
-            # CPU Optimization Settings
             - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
               value: "1"
             - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
@@ -68,33 +65,7 @@ spec:
             - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS
               value: "True"
             - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
-              value: "Europe/Stockholm"               # ← Core Airflow timezone (scheduling, naive datetimes)
-          resources:
-            requests:
-              memory: "1Gi"
-              cpu: "500m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
-          livenessProbe:
-            httpGet:
-              path: /api/v2/version
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 300
-            # CPU Optimization Settings
-            - name: AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL
-              value: "1"
-            - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
-              value: "1"
-            - name: AIRFLOW__CORE__PARALLELISM
-              value: "2"
-            - name: AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG
-              value: "1"
-            - name: AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS
-              value: "True"
-            - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
-              value: "Europe/Stockholm"               # ← Core Airflow timezone (scheduling, naive datetimes)
+              value: "Europe/Stockholm" 
           resources:
             requests:
               memory: "1Gi"
@@ -116,6 +87,5 @@ spec:
       volumes:
         - name: dags-volume
           hostPath:
-            path: /home/development/deployment/airflow/dags
             path: /home/development/deployment/airflow/dags
             type: Directory
