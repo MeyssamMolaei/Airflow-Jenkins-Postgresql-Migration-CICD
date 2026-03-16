@@ -77,4 +77,4 @@ spec:
         - name: grafana-dashboards-volume
           hostPath:
             path: /home/development/deployment/grafana/dashboards
-            type: Directory
+            type: DirectoryOrCreate

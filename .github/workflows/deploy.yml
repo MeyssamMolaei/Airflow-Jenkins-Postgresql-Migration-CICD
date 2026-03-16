@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "kubernetes/*, scripts/*, airflow/dags/*"
+          source: "kubernetes/*, scripts/*, airflow/dags/*, grafana/*"
           target: "~/deployment"
 
       - name: Setup Server
