@@ -48,3 +48,20 @@ Simply push your changes to the `main` branch. GitHub Actions will handle:
 2. Applying the manifests.
 
 > **Note**: Airflow now loads DAGs directly from the server's filesystem (`/home/development/deployment/airflow/dags`) using a `hostPath` volume. This makes it easier to add new DAGs without manual Kubernetes changes.
+## 6. DataDog Monitoring
+I have added a `kubernetes/datadog.yaml` manifest to monitor your Postgres instances.
+
+To enable it:
+1.  Obtain an API key from your DataDog account.
+2.  Base64 encode the key: `echo -n "YOUR_API_KEY" | base64`
+3.  Update the `datadog-secret` in `kubernetes/datadog.yaml` (line 8) with the encoded value.
+4.  Once deployed, DataDog will automatically start monitoring `postgres-p1` and `postgres-p2` using the credentials provided in the manifest.
+
+## 7. Grafana Monitoring
+I have deployed Grafana to visualize your database metrics. 
+
+- **Access URL**: `http://home.meyssam.ir:30300`
+- **Username**: `admin`
+- **Password**: `admin123`
+
+The deployment includes a pre-configured `Data Source` for both `Postgres-P1` and `Postgres-P2`. You can immediately start creating dashboards using these databases once logged in.

@@ -39,6 +39,9 @@
     - Deployment of `scripts/` and `airflow/dags/` folders via SCP.
     - Fixed `kubectl` flags for insecure TLS and validation skip.
 - **Data Generation**: Created `scripts/generate_data.py` to populate P1 with random data via either internal ClusterIP or external NodePort.
+- **Monitoring**: 
+    - Added `kubernetes/datadog.yaml` to monitor Postgres P1 and P2 performance metrics mapping directly into Datadog.
+    - Added `kubernetes/grafana.yaml` providing a localized UI with preconfigured dashboards pointing out to both Postgres P1 and P2 instances. Accessible at port `30300`.
 
 ### 4. Recent Infrastructure Updates
 - **Server Setup Automation**: Created `scripts/setup_server.sh` to automate the installation of Python, K3s, and K9s on fresh Ubuntu 24.04 nodes.
