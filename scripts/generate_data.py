@@ -4,8 +4,31 @@ import psycopg2 # Installation: pip install psycopg2-binary
 import sys
 
 def generate_random_name():
-    first_names = ["John", "Jane", "Alex", "Emily", "Michael", "Sarah", "Chris", "Jessica", "David", "Laura"]
-    last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"]
+    first_names = [
+        "John", "Jane", "Alex", "Emily", "Michael", "Sarah", "Chris", "Jessica", "David", "Laura",
+        "Daniel", "Olivia", "Matthew", "Sophia", "Andrew", "Emma", "James", "Ava", "Joseph", "Isabella",
+        "Ryan", "Mia", "Benjamin", "Charlotte", "William", "Amelia", "Ethan", "Harper", "Noah", "Evelyn",
+        "Lucas", "Abigail", "Henry", "Ella", "Alexander", "Scarlett", "Sebastian", "Grace", "Jack", "Chloe",
+        "Samuel", "Victoria", "Owen", "Riley", "Nathan", "Aria", "Gabriel", "Lily", "Caleb", "Hannah",
+        "Isaac", "Zoe", "Julian", "Nora", "Levi", "Layla", "Anthony", "Ellie", "Dylan", "Aubrey",
+        "Leo", "Sofia", "Thomas", "Penelope", "Charles", "Luna", "Christopher", "Madison", "Joshua", "Camila",
+        "Isaiah", "Elizabeth", "Hudson", "Eleanor", "Christian", "Natalie", "Hunter", "Ruby", "Connor", "Stella",
+        "Aaron", "Aurora", "Adrian", "Violet", "Jonathan", "Savannah", "Jeremiah", "Bella", "Eli", "Claire",
+        "Landon", "Skylar", "Robert", "Lucy", "Nicholas", "Paisley", "Dominic", "Meyssam", "Jaxon", "Anna"
+    ]
+
+    last_names = [
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+        "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+        "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
+        "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
+        "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts",
+        "Gomez", "Phillips", "Evans", "Turner", "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes",
+        "Stewart", "Morris", "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Molaei", "Morgan", "Cooper",
+        "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward", "Richardson",
+        "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray", "Mendoza", "Ruiz", "Hughes",
+        "Price", "Alvarez", "Castillo", "Sanders", "Patel", "Myers", "Long", "Ross", "Foster", "Jimenez"
+    ]
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
 def bulk_generate_p1_data(host="home.meyssam.ir", count=100, port=5432):
@@ -36,9 +59,8 @@ def bulk_generate_p1_data(host="home.meyssam.ir", count=100, port=5432):
             cursor.execute(
                 "INSERT INTO employees (name, department, salary) VALUES (%s, %s, %s)",
                 (name, dept, salary)
-            )
-            
-        connection.commit()
+            )            
+            connection.commit()
         print(f"✅ Successfully inserted {count} records into P1.")
         
         # Verify

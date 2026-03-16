@@ -20,11 +20,12 @@ def sync_data():
 
     # Create table in P2 if it doesn't exist
     dest_cursor.execute("""
-        CREATE TABLE IF NOT EXISTS employees (
+        CREATE TABLE employees (
             id SERIAL PRIMARY KEY,
             name VARCHAR(100),
             department VARCHAR(100),
-            salary NUMERIC
+            salary NUMERIC,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     
@@ -35,12 +36,13 @@ def sync_data():
     from psycopg2.extras import execute_values
     
     insert_query = """
-        INSERT INTO employees (id, name, department, salary) 
+        INSERT INTO employees (id, name, department, salary, created_at) 
         VALUES %s 
         ON CONFLICT (id) DO UPDATE SET 
         name=EXCLUDED.name, 
         department=EXCLUDED.department, 
-        salary=EXCLUDED.salary
+        salary=EXCLUDED.salary,
+        created_at=EXCLUDED.created_at
     """
     
     
