@@ -1,0 +1,670 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "bfg6xnysg7wg0c"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.4.1",
+            "targets": [
+                {
+                    "dataset": "source_db",
+                    "editorMode": "code",
+                    "format": "time_series",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\r\n  max(id) AS \"value\",\r\n  date_trunc('minute', created_at) AS \"time\"\r\nFROM employees\r\ngroup by date_trunc('minute', created_at)\r\nORDER BY \"time\";",
+                    "refId": "A",
+                    "sql": {
+                        "columns": [
+                            {
+                                "alias": "\"value\"",
+                                "name": "COUNT",
+                                "parameters": [
+                                    {
+                                        "name": "id",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            },
+                            {
+                                "alias": "\"time\"",
+                                "name": "$__timeGroup",
+                                "parameters": [
+                                    {
+                                        "name": "created_at",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "$__interval",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "5",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "name": "created_at",
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    },
+                    "table": "employees"
+                }
+            ],
+            "title": "Record insert total",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "bfg6xnysg7wg0c"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.4.1",
+            "targets": [
+                {
+                    "dataset": "source_db",
+                    "editorMode": "code",
+                    "format": "time_series",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\r\n  COUNT(id) AS \"value\",\r\n  date_trunc('minute', created_at) AS \"time\"\r\nFROM employees\r\nGROUP BY date_trunc('minute', created_at)\r\nORDER BY \"time\";",
+                    "refId": "A",
+                    "sql": {
+                        "columns": [
+                            {
+                                "alias": "\"value\"",
+                                "name": "COUNT",
+                                "parameters": [
+                                    {
+                                        "name": "id",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            },
+                            {
+                                "alias": "\"time\"",
+                                "name": "$__timeGroup",
+                                "parameters": [
+                                    {
+                                        "name": "created_at",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "$__interval",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "5",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "name": "created_at",
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    },
+                    "table": "employees"
+                }
+            ],
+            "title": "Record insert / minute",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "bfg6xnysg7wg0c"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "#EAB839",
+                                "value": 10000
+                            },
+                            {
+                                "color": "#6ED0E0",
+                                "value": 11000
+                            },
+                            {
+                                "color": "#EF843C",
+                                "value": 12000
+                            },
+                            {
+                                "color": "#E24D42",
+                                "value": 13000
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "id": 4,
+            "options": {
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto"
+            },
+            "pluginVersion": "12.4.1",
+            "targets": [
+                {
+                    "dataset": "source_db",
+                    "editorMode": "code",
+                    "format": "time_series",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\r\n  COUNT(id) AS \"value\",\r\n  date_trunc('minute', created_at) AS \"time\"\r\nFROM employees\r\nGROUP BY date_trunc('minute', created_at)\r\nORDER BY \"time\";",
+                    "refId": "A",
+                    "sql": {
+                        "columns": [
+                            {
+                                "alias": "\"value\"",
+                                "name": "COUNT",
+                                "parameters": [
+                                    {
+                                        "name": "id",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            },
+                            {
+                                "alias": "\"time\"",
+                                "name": "$__timeGroup",
+                                "parameters": [
+                                    {
+                                        "name": "created_at",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "$__interval",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "5",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "name": "created_at",
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    },
+                    "table": "employees"
+                }
+            ],
+            "title": "Record insert / minute",
+            "type": "gauge"
+        },
+        {
+            "datasource": {
+                "uid": "bfg6xnysg7wg0c"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "id": 1,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.4.1",
+            "targets": [
+                {
+                    "dataset": "source_db",
+                    "editorMode": "builder",
+                    "format": "table",
+                    "rawSql": "SELECT COUNT(id) FROM employees LIMIT 50 ",
+                    "refId": "A",
+                    "sql": {
+                        "columns": [
+                            {
+                                "name": "COUNT",
+                                "parameters": [
+                                    {
+                                        "name": "id",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    },
+                    "table": "employees"
+                }
+            ],
+            "title": "Totall count",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "ffg7cntewi1hcf"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 1,
+                        "pointSize": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "dark-blue",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 16
+            },
+            "id": 5,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.4.1",
+            "targets": [
+                {
+                    "dataset": "source_db",
+                    "datasource": {
+                        "type": "grafana-postgresql-datasource",
+                        "uid": "ffg7cntewi1hcf"
+                    },
+                    "editorMode": "code",
+                    "format": "time_series",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\r\n  max(id) AS \"value\",\r\n  date_trunc('minute', created_at) AS \"time\"\r\nFROM employees\r\ngroup by date_trunc('minute', created_at)\r\nORDER BY \"time\";",
+                    "refId": "A",
+                    "sql": {
+                        "columns": [
+                            {
+                                "alias": "\"value\"",
+                                "name": "COUNT",
+                                "parameters": [
+                                    {
+                                        "name": "id",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            },
+                            {
+                                "alias": "\"time\"",
+                                "name": "$__timeGroup",
+                                "parameters": [
+                                    {
+                                        "name": "created_at",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "$__interval",
+                                        "type": "functionParameter"
+                                    },
+                                    {
+                                        "name": "5",
+                                        "type": "functionParameter"
+                                    }
+                                ],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "name": "created_at",
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    },
+                    "table": "employees"
+                }
+            ],
+            "title": "Record insert total",
+            "type": "timeseries"
+        }
+    ],
+    "preload": false,
+    "refresh": "5s",
+    "schemaVersion": 42,
+    "tags": [
+        "P1"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "2026-03-16T14:59:15.629Z",
+        "to": "2026-03-16T16:09:34.702Z"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Employees Total 2",
+    "uid": "adrbwxl",
+    "version": 22,
+    "weekStart": ""
+}

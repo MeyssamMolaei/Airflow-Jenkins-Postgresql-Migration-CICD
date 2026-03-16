@@ -68,7 +68,13 @@ spec:
           volumeMounts:
             - name: grafana-datasources-volume
               mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboards-volume
+              mountPath: /etc/grafana/provisioning/dashboards
       volumes:
         - name: grafana-datasources-volume
           configMap:
             name: grafana-datasources
+        - name: grafana-dashboards-volume
+          hostPath:
+            path: /home/development/deployment/grafana/dashboards
+            type: Directory
