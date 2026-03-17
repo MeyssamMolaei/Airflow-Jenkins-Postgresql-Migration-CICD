@@ -48,6 +48,10 @@ def bulk_generate_p1_data(host="home.meyssam.ir", count=100, port=5432):
         cursor = connection.cursor()
         
         departments = ['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance']
+        job_titles = ['Junior Developer', 'Senior Developer', 'Manager', 'Analyst', 'Director', 'Consultant', 'Specialist']
+        educations = ['High School', 'Bachelor', 'Master', 'PhD', 'None']
+        cities = ['New York', 'London', 'Berlin', 'Tokyo', 'San Francisco', 'Toronto', 'Sydney']
+        skills = ['Beginner', 'Intermediate', 'Advanced', 'Expert']
         
         print(f"🔗 Connected to P1 at {host}. Inserting {count} records...")
         
@@ -55,10 +59,34 @@ def bulk_generate_p1_data(host="home.meyssam.ir", count=100, port=5432):
             name = generate_random_name()
             dept = random.choice(departments)
             salary = random.randint(45000, 160000)
+            job_title = random.choice(job_titles)
+            experience = random.randint(0, 40)
+            age = random.randint(18, 65)
+            education = random.choice(educations)
+            city = random.choice(cities)
+            tenure = float(f"{random.uniform(0.0, 20.0):.2f}")
+            skill_level = random.choice(skills)
+
+            # Corrupted Data Injector (~5% of the time)
+            # Great for data analysis pipelines checking for dirty data
+            if random.random() < 0.05:
+                corruption_type = random.randint(1, 5)
+                if corruption_type == 1:
+                    age = random.randint(150, 999) # Impossible age
+                elif corruption_type == 2:
+                    salary = random.randint(-50000, -1) # Negative salary
+                elif corruption_type == 3:
+                    experience = -10 # Negative experience
+                elif corruption_type == 4:
+                    city = "   " # Blank spaces for city
+                elif corruption_type == 5:
+                    education = None # Missing data
             
             cursor.execute(
-                "INSERT INTO employees (name, department, salary) VALUES (%s, %s, %s)",
-                (name, dept, salary)
+                """INSERT INTO employees 
+                   (name, department, salary, job_title, experience, age, education, city, tenure, skill_level) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (name, dept, salary, job_title, experience, age, education, city, tenure, skill_level)
             )            
             connection.commit()
         print(f"✅ Successfully inserted {count} records into P1.")

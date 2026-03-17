@@ -15,20 +15,26 @@ def sync_data():
     dest_cursor = dest_conn.cursor()
 
     # Get data from P1
-    src_cursor.execute("SELECT id, name, department, salary, created_at FROM employees")
+    src_cursor.execute("SELECT id, name, department, salary, job_title, experience, age, education, city, tenure, skill_level, created_at FROM employees")
     rows = src_cursor.fetchall()
 
     # Create table in P2 if it doesn't exist
     dest_cursor.execute("""
-        CREATE TABLE employees (
+        CREATE TABLE IF NOT EXISTS employees (
             id SERIAL PRIMARY KEY,
             name VARCHAR(100),
             department VARCHAR(100),
             salary NUMERIC,
+            job_title VARCHAR(100),
+            experience INTEGER,
+            age INTEGER,
+            education VARCHAR(100),
+            city VARCHAR(100),
+            tenure NUMERIC,
+            skill_level VARCHAR(50),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
-    
+    """)    
     # Simple sync: Delete all and re-insert
     # dest_cursor.execute("DELETE FROM employees")
     
@@ -36,12 +42,19 @@ def sync_data():
     from psycopg2.extras import execute_values
     
     insert_query = """
-        INSERT INTO employees (id, name, department, salary, created_at) 
+        INSERT INTO employees (id, name, department, salary, job_title, experience, age, education, city, tenure, skill_level, created_at) 
         VALUES %s 
         ON CONFLICT (id) DO UPDATE SET 
         name=EXCLUDED.name, 
         department=EXCLUDED.department, 
         salary=EXCLUDED.salary,
+        job_title=EXCLUDED.job_title,
+        experience=EXCLUDED.experience,
+        age=EXCLUDED.age,
+        education=EXCLUDED.education,
+        city=EXCLUDED.city,
+        tenure=EXCLUDED.tenure,
+        skill_level=EXCLUDED.skill_level,
         created_at=EXCLUDED.created_at
     """
     

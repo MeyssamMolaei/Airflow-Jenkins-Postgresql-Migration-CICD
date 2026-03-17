@@ -2,41 +2,77 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-datasources
+  labels:
+    app: grafana
 data:
   datasources.yaml: |
     apiVersion: 1
     datasources:
       - name: Postgres-P1
+        uid: postgres-p1
         type: postgres
+        access: proxy
         url: postgres-p1:5432
         database: source_db
         user: postgres
+        isDefault: true
+        editable: true
         secureJsonData:
           password: "p1password"
         jsonData:
-          sslmode: 'disable'
-          postgresVersion: 15
+          sslmode: disable
+          postgresVersion: 1500
+          timescaledb: false
+
       - name: Postgres-P2
+        uid: postgres-p2
         type: postgres
+        access: proxy
         url: postgres-p2:5432
         database: target_db
         user: postgres
+        editable: true
         secureJsonData:
           password: "p2password"
         jsonData:
-          sslmode: 'disable'
-          postgresVersion: 15
+          sslmode: disable
+          postgresVersion: 1500
+          timescaledb: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-providers
+  labels:
+    app: grafana
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+        options:
+          path: /var/lib/grafana/dashboards
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: grafana
+  labels:
+    app: grafana
 spec:
   type: NodePort
   selector:
     app: grafana
   ports:
-    - port: 3000
+    - name: http
+      port: 3000
       targetPort: 3000
       nodePort: 30070
 ---
@@ -45,7 +81,7 @@ kind: StatefulSet
 metadata:
   name: grafana
 spec:
-  serviceName: "grafana"
+  serviceName: grafana
   replicas: 1
   selector:
     matchLabels:
@@ -57,9 +93,11 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:latest
+          image: grafana/grafana:12.4.1
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
+              name: http
           env:
             - name: GF_SECURITY_ADMIN_USER
               value: "admin"
@@ -68,12 +106,19 @@ spec:
           volumeMounts:
             - name: grafana-datasources-volume
               mountPath: /etc/grafana/provisioning/datasources
-            - name: grafana-dashboards-volume
+              readOnly: true
+            - name: grafana-dashboard-providers-volume
               mountPath: /etc/grafana/provisioning/dashboards
+              readOnly: true
+            - name: grafana-dashboards-volume
+              mountPath: /var/lib/grafana/dashboards
       volumes:
         - name: grafana-datasources-volume
           configMap:
             name: grafana-datasources
+        - name: grafana-dashboard-providers-volume
+          configMap:
+            name: grafana-dashboard-providers
         - name: grafana-dashboards-volume
           hostPath:
             path: /home/development/deployment/grafana/dashboards

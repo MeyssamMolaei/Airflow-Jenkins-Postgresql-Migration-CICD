@@ -6,74 +6,47 @@
 ## 🛠️ Implementation Summary (Updated)
 
 ### 1. Infrastructure & Stability
-- **StatefulSets**: Converted all deployments (Airflow, Jenkins, Postgres P1, Postgres P2) to `StatefulSet`.
-    - **Stable Pod Names**: `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`.
-- **Exposed Services**: Postgres instances are exposed via NodePort.
+- **StatefulSets**: Converted all deployments (Airflow, Jenkins, Postgres P1, Postgres P2, Grafana) to `StatefulSet`.
+    - **Stable Pod Names**: `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`, `grafana-0`.
+- **Exposed Services**: Services are exposed via NodePort.
     - **P1 Port**: 30433 (External) / 5432 (Internal)
     - **P2 Port**: 30434 (External) / 5432 (Internal)
-- **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/development/deployment/airflow/dags` on the host server.
-## 🛠️ Implementation Summary (Updated)
+    - **Grafana Port**: 30070 (External) / 3000 (Internal)
+- **HostPaths**: Airflow DAGs and Grafana Dashboards are loaded directly from the host server.
+    - Airflow DAGs: `/home/development/deployment/airflow/dags`
+    - Grafana Dashboards: `/home/development/deployment/grafana/dashboards` (Using `DirectoryOrCreate` to prevent `ContainerCreating` hangs).
 
-### 1. Infrastructure & Stability
-- **StatefulSets**: Converted all deployments (Airflow, Jenkins, Postgres P1, Postgres P2) to `StatefulSet`.
-    - **Stable Pod Names**: `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`.
-- **Exposed Services**: Postgres instances are exposed via NodePort.
-    - **P1 Port**: 30433 (External) / 5432 (Internal)
-    - **P2 Port**: 30434 (External) / 5432 (Internal)
-- **Airflow DAGs**: Switched from ConfigMap volumes to `hostPath`. DAGs are now deployed to `/home/development/deployment/airflow/dags` on the host server.
+### 2. Monitoring & Observability
+- **DataDog**: Added `kubernetes/datadog.yaml` to deploy a DataDog Agent that automatically monitors both Postgres instances. (Requires API key configuration).
+- **Grafana**: Deployed Grafana with pre-configured Data Sources connecting flawlessly to `Postgres-P1` and `Postgres-P2`. It mounts dashboard configurations automatically.
 
-### 2. Airflow Configuration & Optimization
-- **Credentials**: Fixed admin account created via custom entrypoint:
-    - **User**: `madmin`
-    - **Password**: `CHANGE_ME`
-- **CPU Optimization**:
-    - Reduced DAG parsing frequency to 30s.
-    - Set resource limits to cap Airflow at 1 CPU core (250m request, 1000m limit).
-    - Capped parallelism and active tasks.
-- **DAG Optimization**: 
-    - Re-wrote `db_sync.py` to use `execute_values` (batch insertion) instead of row-by-row loops. This allows efficient syncing of 100,000+ records with minimal CPU overhead.
+### 3. Airflow Configuration & Optimization
+- **Credentials**: Fixed admin account created via custom entrypoint (`madmin`).
+- **Timezone**: Set default timezone to `Europe/Stockholm`.
+- **CPU Optimization**: Reduced DAG parsing frequency (`MIN_FILE_PROCESS_INTERVAL: 1`), configured resource limits, and capped active tasks.
+- **DAG Optimization (`db_sync.py`)**: 
+    - Re-wrote `db_sync.py` to use `psycopg2.extras.execute_values` for high-performance batch insertion.
+    - Added sync support for the `created_at` timestamp.
+    - Handles conflicts smoothly with `ON CONFLICT (id) DO UPDATE SET`.
 
-### 3. CI/CD & Scripts
-- **GitHub Actions**: Updated `.github/workflows/deploy.yml` with:
-    - Cleanup step (`kubectl delete ... --all`) to ensure fresh deployments.
-    - Deployment of `scripts/` and `airflow/dags/` folders via SCP.
-    - Fixed `kubectl` flags for insecure TLS and validation skip.
-- **Data Generation**: Created `scripts/generate_data.py` to populate P1 with random data via either internal ClusterIP or external NodePort.
-- **Monitoring**: 
-    - Added `kubernetes/datadog.yaml` to monitor Postgres P1 and P2 performance metrics mapping directly into Datadog.
-    - Added `kubernetes/grafana.yaml` providing a localized UI with preconfigured dashboards pointing out to both Postgres P1 and P2 instances. Accessible at port `30300`.
+### 4. CI/CD & Deployments
+- **GitHub Actions**: `.github/workflows/deploy.yml` utilizes SCP to deploy `kubernetes/`, `scripts/`, `airflow/dags/`, and `grafana/` directories.
+- **Cleanup**: Implemented `kubectl delete ...` to discard old pods cleanly before new applies roll out.
+- **Data Generation**: `scripts/generate_data.py` enhanced with a rich, expansive list of first/last names to populate realistic mock sets over 100,000s of lines.
 
-### 4. Recent Infrastructure Updates
-- **Server Setup Automation**: Created `scripts/setup_server.sh` to automate the installation of Python, K3s, and K9s on fresh Ubuntu 24.04 nodes.
-- **User Migration**: Migrated the entire deployment from the `deploy` user to the `development` user, including SSH configurations and `hostPath` volume paths.
-- **Postgres Authentication**: Disabled authentication for `postgres-p1` and `postgres-p2` using `POSTGRES_HOST_AUTH_METHOD: trust` to simplify internal communication and fix connection issues.
-- **Airflow Stability**:
-    - Configured resource requests/limits (500m-1000m CPU, 1Gi-2Gi RAM).
-    - Optimized scheduler intervals (`MIN_FILE_PROCESS_INTERVAL: 30`) to reduce CPU overhead.
-    - Updated connection strings to passwordless format.
-- **Diagnostics**: Created `scripts/debug_k8s.sh` to collect pod logs and analyze cluster events for troubleshooting.
+### 5. Jenkins Automation
+- **API Token Handling**: `Jenkinsfile` rewritten to properly generate Airflow JWT tokens and interact with Airflow 2.x API using the `PATCH` endpoint to unpause jobs dynamically.
 
 ## 🔑 Crucial Connections
-- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db` (Trust Auth)
-- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db` (Trust Auth)
+- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db`
+- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db`
 - **Airflow Web UI**: `http://home.meyssam.ir:30080` (User: `madmin`)
+- **Grafana Web UI**: `http://home.meyssam.ir:30070` (User: `admin`, Pass: `admin123`)
 - **Jenkins Web UI**: `http://home.meyssam.ir:30090`
 
 ## 📝 Recent Files Modified
-- `kubernetes/airflow.yaml`: Resource tuning and passwordless connections.
-- `kubernetes/postgres-p1.yaml` & `postgres-p2.yaml`: Enabled `trust` authentication.
-- `.github/workflows/deploy.yml`: Switched to `development` user and added setup/debug support.
-- `scripts/debug_k8s.sh`: New diagnostic tool.
-- `scripts/setup_server.sh`: New server initialization script.
-## 🔑 Crucial Connections
-- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db` (Trust Auth)
-- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db` (Trust Auth)
-- **Airflow Web UI**: `http://home.meyssam.ir:30080` (User: `madmin`)
-- **Jenkins Web UI**: `http://home.meyssam.ir:30090`
-
-## 📝 Recent Files Modified
-- `kubernetes/airflow.yaml`: Resource tuning and passwordless connections.
-- `kubernetes/postgres-p1.yaml` & `postgres-p2.yaml`: Enabled `trust` authentication.
-- `.github/workflows/deploy.yml`: Switched to `development` user and added setup/debug support.
-- `scripts/debug_k8s.sh`: New diagnostic tool.
-- `scripts/setup_server.sh`: New server initialization script.
+- `kubernetes/grafana.yaml`: Grafana deployment and fixing `hostPath` Volume setup.
+- `kubernetes/datadog.yaml`: DataDog configurations setup.
+- `airflow/dags/db_sync.py`: DAG expanded for new columns (`created_at`).
+- `scripts/generate_data.py`: Extended random generator values.
+- `Jenkinsfile`: Refactored to properly communicate via Airflow REST API.
