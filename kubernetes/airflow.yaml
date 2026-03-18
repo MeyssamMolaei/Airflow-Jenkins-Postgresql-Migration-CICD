@@ -81,6 +81,16 @@ spec:
               value: "True"
             - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
               value: "Europe/Stockholm" 
+            - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
+              value: "True"
+            - name: AIRFLOW__METRICS__STATSD_ON
+              value: "True"
+            - name: AIRFLOW__METRICS__STATSD_HOST
+              value: "statsd-exporter"
+            - name: AIRFLOW__METRICS__STATSD_PORT
+              value: "8125"
+            - name: AIRFLOW__METRICS__STATSD_PREFIX
+              value: "airflow"
           resources:
             requests:
               memory: "1Gi"
