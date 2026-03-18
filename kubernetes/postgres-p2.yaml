@@ -29,25 +29,29 @@ spec:
       initContainers:
         - name: fix-permissions
           image: busybox
-          command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
+          command: ["sh", "-c", "mkdir -p ~/deployment/postgresql/postgres-p2/data && chown -R 999:999 ~/deployment/postgresql/postgres-p2/data"]
           volumeMounts:
             - name: postgres-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: ~/deployment/postgresql/postgres-p2/data
       containers:
         - name: postgres
           image: postgres:latest
           env:
             - name: POSTGRES_HOST_AUTH_METHOD
               value: "trust"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "p2password"
             - name: POSTGRES_DB
               value: "target_db"
           ports:
             - containerPort: 5432
           volumeMounts:
             - name: postgres-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: ~/deployment/postgresql/postgres-p2/data
       volumes:
         - name: postgres-data
           hostPath:
-            path: /home/development/deployment/data/postgres-p2
+            path: /home/development/deployment/postgresql/postgres-p2/data
             type: DirectoryOrCreate

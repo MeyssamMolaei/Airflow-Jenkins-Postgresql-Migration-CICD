@@ -51,7 +51,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: busybox
-          command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
+          command: ["sh", "-c", "mkdir -p ~/deployment/postgresql/postgres-p1/data && chown -R 999:999 ~/deployment/postgresql/postgres-p1/data"]
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
@@ -61,6 +61,10 @@ spec:
           env:
             - name: POSTGRES_HOST_AUTH_METHOD
               value: "trust"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "p1password"
             - name: POSTGRES_DB
               value: "source_db"
           ports:
@@ -69,12 +73,12 @@ spec:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
             - name: postgres-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: ~/deployment/postgresql/postgres-p1/data
       volumes:
         - name: init-script
           configMap:
             name: postgres-p1-init
         - name: postgres-data
           hostPath:
-            path: /home/development/deployment/data/postgres-p1
+            path: /home/development/deployment/postgresql/postgres-p1/data
             type: DirectoryOrCreate
