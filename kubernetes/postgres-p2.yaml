@@ -26,6 +26,13 @@ spec:
       labels:
         app: postgres-p2
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
       containers:
         - name: postgres
           image: postgres:latest
@@ -36,3 +43,11 @@ spec:
               value: "target_db"
           ports:
             - containerPort: 5432
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          hostPath:
+            path: /home/development/deployment/data/postgres-p2
+            type: DirectoryOrCreate

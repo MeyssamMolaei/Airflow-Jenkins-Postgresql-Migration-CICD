@@ -91,6 +91,15 @@ spec:
       labels:
         app: grafana
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 472:472 /var/lib/grafana /var/lib/grafana/dashboards"]
+          volumeMounts:
+            - name: grafana-data
+              mountPath: /var/lib/grafana
+            - name: grafana-dashboards-volume
+              mountPath: /var/lib/grafana/dashboards
       containers:
         - name: grafana
           image: grafana/grafana:12.4.1
@@ -112,6 +121,8 @@ spec:
               readOnly: true
             - name: grafana-dashboards-volume
               mountPath: /var/lib/grafana/dashboards
+            - name: grafana-data
+              mountPath: /var/lib/grafana
       volumes:
         - name: grafana-datasources-volume
           configMap:
@@ -122,4 +133,8 @@ spec:
         - name: grafana-dashboards-volume
           hostPath:
             path: /home/development/deployment/grafana/dashboards
+            type: DirectoryOrCreate
+        - name: grafana-data
+          hostPath:
+            path: /home/development/deployment/data/grafana
             type: DirectoryOrCreate

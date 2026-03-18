@@ -32,6 +32,13 @@ spec:
       labels:
         app: jenkins
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /var/jenkins_home"]
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
       containers:
         - name: jenkins
           image: jenkins/jenkins:latest
@@ -45,3 +52,11 @@ spec:
           env:
             - name: JAVA_OPTS
               value: "-Djenkins.install.runSetupWizard=false"
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-data
+          hostPath:
+            path: /home/development/deployment/data/jenkins
+            type: DirectoryOrCreate

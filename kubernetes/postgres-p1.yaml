@@ -48,6 +48,13 @@ spec:
       labels:
         app: postgres-p1
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
       containers:
         - name: postgres
           image: postgres:latest
@@ -61,7 +68,13 @@ spec:
           volumeMounts:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: init-script
           configMap:
             name: postgres-p1-init
+        - name: postgres-data
+          hostPath:
+            path: /home/development/deployment/data/postgres-p1
+            type: DirectoryOrCreate
