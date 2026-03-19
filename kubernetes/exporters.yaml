@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres-exporter-p1
 spec:
+  serviceName: "postgres-exporter-p1"
   replicas: 1
   selector:
     matchLabels:
@@ -33,10 +34,11 @@ spec:
     app: postgres-exporter-p1
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: postgres-exporter-p2
 spec:
+  serviceName: "postgres-exporter-p2"
   replicas: 1
   selector:
     matchLabels:
@@ -67,10 +69,11 @@ spec:
     app: postgres-exporter-p2
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: statsd-exporter
 spec:
+  serviceName: "statsd-exporter"
   replicas: 1
   selector:
     matchLabels:
