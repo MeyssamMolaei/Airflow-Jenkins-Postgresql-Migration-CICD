@@ -29,6 +29,7 @@ spec:
       initContainers:
         - name: wait-for-postgres
           image: postgres:latest
+          imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -44,6 +45,7 @@ spec:
       containers:
         - name: airflow
           image: apache/airflow:latest
+          imagePullPolicy: IfNotPresent
           command: ["/bin/bash", "-c"]
           args:
             - |

@@ -5,48 +5,48 @@
 
 ## 🛠️ Implementation Summary (Updated)
 
-### 1. Infrastructure & Stability
-- **StatefulSets**: Converted all deployments (Airflow, Jenkins, Postgres P1, Postgres P2, Grafana) to `StatefulSet`.
-    - **Stable Pod Names**: `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`, `grafana-0`.
-- **Exposed Services**: Services are exposed via NodePort.
+### 1. Infrastructure, Stability & Data Persistence
+- **StatefulSets**: Converted all deployments across the board to `StatefulSet` so that **all pods have static names**:
+    - `airflow-0`, `jenkins-0`, `postgres-p1-0`, `postgres-p2-0`, `grafana-0`.
+    - `postgres-exporter-p1-0`, `postgres-exporter-p2-0`, `statsd-exporter-0`.
+- **Persistent Storage (`hostPath`)**: Set up robust data retention mapped to local server directories (`/home/development/deployment/...`).
+    - *Postgres P1/P2*: Mapped data nodes dynamically using `initContainers` fixing recursive `chown 999:999` permissions to resolve user write conflicts.
+    - *Jenkins*: Protected Jenkins master configurations mapping to `/var/jenkins_home` (`chown 1000:1000`).
+    - *Grafana*: Protected raw dashboard plugins and UI settings mapping strictly to `/var/lib/grafana` (`chown 472:472`).
+- **Exposed Services**: 
     - **P1 Port**: 30433 (External) / 5432 (Internal)
     - **P2 Port**: 30434 (External) / 5432 (Internal)
     - **Grafana Port**: 30070 (External) / 3000 (Internal)
-- **HostPaths**: Airflow DAGs and Grafana Dashboards are loaded directly from the host server.
-    - Airflow DAGs: `/home/development/deployment/airflow/dags`
-    - Grafana Dashboards: `/home/development/deployment/grafana/dashboards` (Using `DirectoryOrCreate` to prevent `ContainerCreating` hangs).
 
-### 2. Monitoring & Observability
-- **DataDog**: Added `kubernetes/datadog.yaml` to deploy a DataDog Agent that automatically monitors both Postgres instances. (Requires API key configuration).
-- **Grafana**: Deployed Grafana with pre-configured Data Sources connecting flawlessly to `Postgres-P1` and `Postgres-P2`. It mounts dashboard configurations automatically.
+### 2. Monitoring & Observability Stack
+- **Prometheus Pipeline**: Deployed `kubernetes/prometheus.yaml` to scrape system metrics rapidly. Set as a fully automated default Data Source in Grafana.
+- **Exporters (`kubernetes/exporters.yaml`)**:
+    - **Postgres Exporter P1/P2**: Running cleanly on port 9187 interacting with database endpoints directly.
+    - **StatsD Exporter**: Capturing live metric hooks natively from Airflow execution nodes on UDP port 8125.
+- **Airflow Initialization Order**: Attached an explicit `initContainer` running sequential `pg_isready` queries forcing Airflow to sleep 30 seconds explicitly *after* the databases boot, completely eliminating race conditions.
 
-### 3. Airflow Configuration & Optimization
-- **Credentials**: Fixed admin account created via custom entrypoint (`madmin`).
-- **Timezone**: Set default timezone to `Europe/Stockholm`.
-- **CPU Optimization**: Reduced DAG parsing frequency (`MIN_FILE_PROCESS_INTERVAL: 1`), configured resource limits, and capped active tasks.
-- **DAG Optimization (`db_sync.py`)**: 
-    - Re-wrote `db_sync.py` to use `psycopg2.extras.execute_values` for high-performance batch insertion.
-    - Added sync support for the `created_at` timestamp.
-    - Handles conflicts smoothly with `ON CONFLICT (id) DO UPDATE SET`.
+### 3. Airflow Configuration & Code Expansion
+- **Airflow Tuning**: CPU Parsing fixed (`MIN_FILE_PROCESS_INTERVAL: 1`), Timezone locked to `Europe/Stockholm`, StatsD telemetry (`AIRFLOW__METRICS__STATSD_ON`) fully enabled.
+- **DAG Enhancements (`db_sync.py`)**: 
+    - Database schema significantly widened (`job_title`, `experience`, `age`, `education`, `city`, `tenure`, `skill_level`, and `created_at`).
+    - Logic overhauled to leverage `psycopg2.extras.execute_values` for high-performance batch insertion resolving ON CONFLICT duplicates instantly.
 
 ### 4. CI/CD & Deployments
-- **GitHub Actions**: `.github/workflows/deploy.yml` utilizes SCP to deploy `kubernetes/`, `scripts/`, `airflow/dags/`, and `grafana/` directories.
-- **Cleanup**: Implemented `kubectl delete ...` to discard old pods cleanly before new applies roll out.
-- **Data Generation**: `scripts/generate_data.py` enhanced with a rich, expansive list of first/last names to populate realistic mock sets over 100,000s of lines.
+- **GitHub Actions**: Pipeline (`deploy.yml`) is completely destructive-first. Discards old Pods before triggering native rollout logic mirroring entire file blocks.
+- **Data Generation Engine**: `scripts/generate_data.py` enhanced with over 50x naming parameters. Implemented a dynamic **5% Corrupted Data Injector** designed exclusively for data analysis exercises (negative salaries, non-existent cities, bizarre ages).
 
 ### 5. Jenkins Automation
-- **API Token Handling**: `Jenkinsfile` rewritten to properly generate Airflow JWT tokens and interact with Airflow 2.x API using the `PATCH` endpoint to unpause jobs dynamically.
+- **API Token Handling**: `Jenkinsfile` rewritten to generate Airflow JWT tokens flawlessly using `cURL`, then explicitly commanding Airflow 2.x REST APIs to unpause synchronized tasks.
 
 ## 🔑 Crucial Connections
-- **Postgres P1 (Internal)**: `postgresql://postgres@postgres-p1:5432/source_db`
-- **Postgres P2 (Internal)**: `postgresql://postgres@postgres-p2:5432/target_db`
+- **Postgres P1 (Internal)**: `postgresql://postgres:p1password@postgres-p1:5432/source_db`
+- **Postgres P2 (Internal)**: `postgresql://postgres:p2password@postgres-p2:5432/target_db`
 - **Airflow Web UI**: `http://home.meyssam.ir:30080` (User: `madmin`)
 - **Grafana Web UI**: `http://home.meyssam.ir:30070` (User: `admin`, Pass: `admin123`)
 - **Jenkins Web UI**: `http://home.meyssam.ir:30090`
 
 ## 📝 Recent Files Modified
-- `kubernetes/grafana.yaml`: Grafana deployment and fixing `hostPath` Volume setup.
-- `kubernetes/datadog.yaml`: DataDog configurations setup.
+- `kubernetes/exporters.yaml` & `prometheus.yaml`: Completely designed the scraping metrics structure.
+- `kubernetes/postgres-*.yaml` & `kubernetes/jenkins.yaml` & `kubernetes/grafana.yaml`: Secured Data logic.
 - `airflow/dags/db_sync.py`: DAG expanded for new columns (`created_at`).
-- `scripts/generate_data.py`: Extended random generator values.
-- `Jenkinsfile`: Refactored to properly communicate via Airflow REST API.
+- `scripts/generate_data.py`: Extended random generator values / dirty data logic.
