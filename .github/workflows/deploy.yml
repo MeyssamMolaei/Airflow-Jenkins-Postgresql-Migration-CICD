@@ -75,4 +75,4 @@ jobs:
             echo "🚀 Applying monitoring exporters and integrations..."
             kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/exporters.yaml
             kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/prometheus.yaml
-            kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/datadog.yaml || true
+            # kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/datadog.yaml || true
