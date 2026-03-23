@@ -28,7 +28,8 @@ spec:
     spec:
       initContainers:
         - name: fix-permissions
-          image: busybox
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "mkdir -p ~/deployment/postgresql/postgres-p2/data && chown -R 999:999 ~/deployment/postgresql/postgres-p2/data"]
           volumeMounts:
             - name: postgres-data
@@ -36,6 +37,7 @@ spec:
       containers:
         - name: postgres
           image: postgres:latest
+          imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_HOST_AUTH_METHOD
               value: "trust"

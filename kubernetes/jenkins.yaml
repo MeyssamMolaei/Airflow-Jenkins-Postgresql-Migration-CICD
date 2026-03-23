@@ -34,7 +34,8 @@ spec:
     spec:
       initContainers:
         - name: fix-permissions
-          image: busybox
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "chown -R 1000:1000 /var/jenkins_home"]
           volumeMounts:
             - name: jenkins-data
@@ -42,6 +43,7 @@ spec:
       containers:
         - name: jenkins
           image: jenkins/jenkins:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8080
