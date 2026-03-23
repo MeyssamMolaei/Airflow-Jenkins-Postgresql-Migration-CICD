@@ -14,3 +14,7 @@ curl -f -sS -X POST 'http://192.168.1.88:30080/api/v2/dags/postgres_sync_p1_to_p
   -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' \
   -d "{\"logical_date\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"dag_run_id\":\"rerun_$(date +%s)\",\"conf\":{\"source\":\"jenkins\",\"rerun\":true}}"
+
+
+# kubectl get svc --no-headers | awk '$1!="kubernetes"{print $3" "$1}' | sudo tee /tmp/k8s_hosts_entries >/dev/null && for h in $(awk '{print $2}' /tmp/k8s_hosts_entries); do sudo sed -i "/[[:space:]]${h}\$/d" /etc/hosts; done && sudo bash -c 'cat /tmp/k8s_hosts_entries >> /etc/hosts'
+# python3 ~/deployment/scripts/generate_data.py postgres-p0 5432 100000
