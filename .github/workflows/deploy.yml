@@ -50,6 +50,7 @@ jobs:
             echo "🚀 Deploying new manifests..."
             cd ~/deployment/kubernetes
             export KUBECONFIG=/home/development/.kube/config
+            ~/deployment/scripts/image_pull.sh
             kubectl get nodes
             # kubectl --insecure-skip-tls-verify=true delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
             kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/postgres-p1.yaml
