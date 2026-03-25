@@ -13,16 +13,21 @@ data:
         type: postgres
         access: proxy
         url: postgres-p1:5432
-        database: source_db
         user: postgres
         isDefault: true
         editable: true
         secureJsonData:
           password: "p1password"
         jsonData:
+          database: source_db
           sslmode: disable
           postgresVersion: 1500
           timescaledb: false
+          maxOpenConns: 100
+          maxIdleConns: 100
+          maxIdleConnsAuto: true
+          connMaxLifetime: 14400
+
 
       - name: Postgres-P2
         uid: postgres-p2
@@ -35,16 +40,22 @@ data:
         secureJsonData:
           password: "p2password"
         jsonData:
+          database: target_db
+          sslmode: disable
           postgresVersion: 1500
           timescaledb: false
+          maxOpenConns: 100
+          maxIdleConns: 100
+          maxIdleConnsAuto: true
+          connMaxLifetime: 14400
 
-      # - name: Prometheus
-      #   uid: prometheus
-      #   type: prometheus
-      #   access: proxy
-      #   url: http://prometheus:9090
-      #   isDefault: true
-      #   editable: true
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+        editable: true
 ---
 apiVersion: v1
 kind: ConfigMap

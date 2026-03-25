@@ -14,9 +14,9 @@ images=(
 
 for image in "${images[@]}"; do
   echo "Pulling $image ..."
-  sudo crictl pull "$image"
+  sudo ctr -n k8s.io images pull "$image"
 done
 
 echo
 echo "Pulled images:"
-sudo crictl images | egrep 'airflow|postgres-exporter|statsd-exporter|prometheus|grafana|busybox|jenkins|postgres'
+sudo ctr -n k8s.io images list | egrep 'airflow|postgres-exporter|statsd-exporter|prometheus|grafana|busybox|jenkins|postgres'
