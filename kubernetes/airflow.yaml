@@ -28,7 +28,7 @@ spec:
     spec:
       initContainers:
         - name: wait-for-postgres
-          image: postgres:14.22-trixie
+          image: postgres:latest
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
@@ -44,7 +44,7 @@ spec:
               echo "🚀 Starting Airflow now!"
       containers:
         - name: airflow
-          image: apache/airflow:2.11.2
+          image: apache/airflow:latest
           # image: apache/airflow:3.1.8-python3.10
           imagePullPolicy: IfNotPresent
           command: ["/bin/bash", "-c"]

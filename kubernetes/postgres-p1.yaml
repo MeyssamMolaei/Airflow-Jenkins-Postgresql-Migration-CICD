@@ -51,7 +51,7 @@ spec:
     spec:
       initContainers:
         - name: fix-permissions
-          image: busybox:1.37.0
+          image: busybox:latest
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "mkdir -p ~/deployment/postgresql/postgres-p1/data && chown -R 999:999 ~/deployment/postgresql/postgres-p1/data"]
           volumeMounts:
@@ -59,7 +59,7 @@ spec:
               mountPath: /var/lib/postgresql/data
       containers:
         - name: postgres
-          image: postgres:14.22-trixie
+          image: postgres:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_HOST_AUTH_METHOD

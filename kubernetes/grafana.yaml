@@ -100,7 +100,7 @@ spec:
     spec:
       initContainers:
         - name: fix-permissions
-          image: busybox:1.37.0
+          image: busybox:latest
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "chown -R 472:472 /var/lib/grafana /var/lib/grafana/dashboards"]
           volumeMounts:
@@ -110,7 +110,7 @@ spec:
               mountPath: /var/lib/grafana/dashboards
       containers:
         - name: grafana
-          image: grafana/grafana:12.4.1
+          image: grafana/grafana:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
