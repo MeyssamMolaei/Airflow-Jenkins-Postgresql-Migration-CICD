@@ -36,6 +36,7 @@ data:
         url: postgres-p2:5432
         database: target_db
         user: postgres
+        isDefault: false
         editable: true
         secureJsonData:
           password: "p2password"
@@ -54,7 +55,7 @@ data:
         type: prometheus
         access: proxy
         url: http://prometheus:9090
-        isDefault: true
+        isDefault: false
         editable: true
 ---
 apiVersion: v1
