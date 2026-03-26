@@ -79,7 +79,20 @@ def sync_data():
                     tenure,
                     skill_level,
                     created_at
-                FROM employees
+                FROM public.employees
+                where true
+                and id is not null
+                and name is not null
+                and department is not null
+                and salary > 0
+                and job_title is not null
+                and experience > 0
+                and age > 0
+                and education is not null
+                and city is not null
+                and tenure is not null
+                and skill_level is not null
+                and created_at is not null
                 ORDER BY id
             """)
 
