@@ -29,7 +29,7 @@ spec:
   ports:
     - port: 5432
       targetPort: 5432
-      nodePort: 30433 # External access on 30433, mapping to 5433 is usually done via firewall/host NAT
+      nodePort: 30433
   selector:
     app: postgres-p1
   clusterIP: 10.43.100.10
@@ -53,7 +53,7 @@ spec:
         - name: fix-permissions
           image: busybox:latest
           imagePullPolicy: IfNotPresent
-          command: ["sh", "-c", "mkdir -p ~/deployment/postgresql/postgres-p1/data && chown -R 999:999 ~/deployment/postgresql/postgres-p1/data"]
+          command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
@@ -70,13 +70,22 @@ spec:
               value: "p1password"
             - name: POSTGRES_DB
               value: "source_db"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
           ports:
             - containerPort: 5432
           volumeMounts:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
             - name: postgres-data
-              mountPath: ~/deployment/postgresql/postgres-p1/data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: init-script
           configMap:
