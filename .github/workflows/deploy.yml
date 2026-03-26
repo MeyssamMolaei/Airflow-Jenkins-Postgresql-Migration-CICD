@@ -73,7 +73,11 @@ jobs:
             echo "⏳ Waiting for Grafana to be ready..."
             kubectl --insecure-skip-tls-verify=true rollout status statefulset/grafana --timeout=120s
 
-            echo "🚀 Applying monitoring exporters and integrations..."
+            echo "⏳ Applying monitoring exporters and integrations..."
             kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/exporters.yaml
             kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/prometheus.yaml
+
+            kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/busybox.yaml
+            echo "🚀 Waiting for Busybox to be ready..."
+            kubectl --insecure-skip-tls-verify=true rollout status statefulset/busybox --timeout=120s
             # kubectl --insecure-skip-tls-verify=true apply -f ~/deployment/kubernetes/datadog.yaml || true
