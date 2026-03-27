@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: tools
-          image: debian:stable-slim
+          # image: debian:stable-slim
+          image: my-tools:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: tools-volume
@@ -25,35 +26,12 @@ spec:
               mountPath: /var/cache/apt/archives
             - name: apt-lists
               mountPath: /var/lib/apt/lists
+            - name: scripts
+              mountPath: /scripts
           command: ["/bin/bash", "-c"]
           args:
             - |
               set -e
-
-              mkdir -p /var/cache/apt/archives/partial
-              mkdir -p /var/lib/apt/lists/partial
-
-              cat >/etc/apt/apt.conf.d/99local-cache <<'EOF'
-              Binary::apt::APT::Keep-Downloaded-Packages "true";
-              APT::Keep-Downloaded-Packages "true";
-              EOF
-
-              apt-get update
-              apt-get install -y --no-install-recommends \
-                python3 \
-                python3-pip \
-                postgresql-client \
-                iputils-ping \
-                ca-certificates \
-                dnsutils \
-                curl \
-                wget \
-                nano \
-                openssh-server \
-                openssh-client \
-                netcat-openbsd
-
-              echo "Tools container is ready."
               sleep infinity
       volumes:
         - name: tools-volume
@@ -68,3 +46,7 @@ spec:
           hostPath:
             path: /home/development/deployment/tools-pod/apt-lists
             type: DirectoryOrCreate
+        - name: scripts
+          hostPath:
+            path: /home/development/deployment/scripts
+            type: Directory
