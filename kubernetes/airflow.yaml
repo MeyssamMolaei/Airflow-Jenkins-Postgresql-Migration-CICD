@@ -40,7 +40,7 @@ spec:
               while ! pg_isready -h postgres-p2 -p 5432 -U postgres; do sleep 5; done
               
               echo "✅ Both databases are ready! Waiting an additional 30 seconds before deploying Airflow..."
-              sleep 30
+              sleep 5
               echo "🚀 Starting Airflow now!"
       containers:
         - name: airflow
@@ -49,14 +49,18 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              airflow db init
-              airflow users create \
-                --username madmin \
-                --password "$AIRFLOW_WWW_USER_PASSWORD" \
-                --firstname Meyssam \
-                --lastname Molaye \
-                --role Admin \
-                --email meyssam.molaye@gmail.com
+              apt update
+              apt install -y python3-psycopg2
+              echo "root:qazwsx" | chpasswd
+              echo "airflow:qazwsx" | chpasswd
+              airflow db reset --yes
+              # airflow users create \
+              #   --username madmin \
+              #   --password "$AIRFLOW_WWW_USER_PASSWORD" \
+              #   --firstname Meyssam \
+              #   --lastname Molaye \
+              #   --role Admin \
+              #   --email meyssam.molaye@gmail.com
               airflow standalone
           env:
             - name: TZ

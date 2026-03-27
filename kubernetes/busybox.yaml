@@ -32,6 +32,38 @@ spec:
           args:
             - |
               set -e
+
+              # mkdir -p /var/cache/apt/archives/partial
+              # mkdir -p /var/lib/apt/lists/partial
+
+              # cat >/etc/apt/apt.conf.d/99local-cache <<'EOF'
+              # Binary::apt::APT::Keep-Downloaded-Packages "true";
+              # APT::Keep-Downloaded-Packages "true";
+              # EOF
+
+              # apt-get update
+              # apt-get install -y --no-install-recommends \
+              #   python3 \
+              #   python3-pip \
+              #   postgresql-client \
+              #   iputils-ping \
+              #   ca-certificates \
+              #   dnsutils \
+              #   curl \
+              #   wget \
+              #   nano \
+              #   openssh-server \
+              #   openssh-client \
+              #   netcat-openbsd \
+              #   python3-psycopg2 \
+              #   python3-pandas \
+              #   python3-sqlalchemy
+              
+              # sudo /home/linuxbrew/.linuxbrew/bin/nerdctl \
+              #   --address /run/k3s/containerd/containerd.sock \
+              #   -n k8s.io commit 278dd406c9f60 my-tools:latest
+
+              echo "Tools container is ready."
               sleep infinity
       volumes:
         - name: tools-volume

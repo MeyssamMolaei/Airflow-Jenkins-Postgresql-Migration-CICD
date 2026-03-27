@@ -61,6 +61,10 @@ jobs:
             echo "⏳ Waiting for Postgres-P2 to be ready..."
             kubectl rollout status statefulset/postgres-p2 --timeout=120s
 
+            kubectl apply -f ~/deployment/kubernetes/mongodb.yaml
+            echo "⏳ Waiting for MongoDB to be ready..."
+            kubectl rollout status statefulset/mongodb --timeout=120s
+
             kubectl apply -f ~/deployment/kubernetes/airflow.yaml
             echo "⏳ Waiting for Airflow to be ready..."
             kubectl rollout status statefulset/airflow --timeout=300s
