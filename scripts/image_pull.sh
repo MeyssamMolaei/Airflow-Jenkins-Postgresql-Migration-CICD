@@ -11,6 +11,7 @@ images=(
   "docker.io/jenkins/jenkins:latest"
   "docker.io/library/postgres:latest"
   "docker.io/library/mongo:latest"
+  "docker.io/bitnami/spark:latest"
 )
 
 for image in "${images[@]}"; do
@@ -20,4 +21,4 @@ done
 
 echo
 echo "Pulled images:"
-sudo ctr -n k8s.io images list | egrep 'airflow|postgres-exporter|statsd-exporter|prometheus|grafana|busybox|jenkins|postgres|mongo'
+sudo ctr -n k8s.io images list | egrep 'airflow|postgres-exporter|statsd-exporter|prometheus|grafana|busybox|jenkins|postgres|mongo|spark'

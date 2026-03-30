@@ -73,9 +73,12 @@ jobs:
             echo "⏳ Waiting for Jenkins to be ready..."
             kubectl rollout status statefulset/jenkins --timeout=300s
 
-            kubectl apply -f ~/deployment/kubernetes/grafana.yaml
-            echo "⏳ Waiting for Grafana to be ready..."
-            kubectl rollout status statefulset/grafana --timeout=120s
+            kubectl delete -f ~/deployment/kubernetes/grafana.yaml || true
+            echo "🗑️ Grafana deleted."
+
+            kubectl apply -f ~/deployment/kubernetes/spark.yaml
+            echo "⏳ Waiting for Spark to be ready..."
+            kubectl rollout status statefulset/spark --timeout=120s
 
             echo "⏳ Applying monitoring exporters and integrations..."
             kubectl delete -f ~/deployment/kubernetes/exporters.yaml
@@ -85,4 +88,4 @@ jobs:
             echo "🚀 Waiting for Busybox to be ready..."
             kubectl rollout status statefulset/tools-pod --timeout=120s
             # kubectl apply -f ~/deployment/kubernetes/datadog.yaml || true
-            
+

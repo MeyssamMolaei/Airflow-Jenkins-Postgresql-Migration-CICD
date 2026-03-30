@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark
+spec:
+  type: NodePort
+  ports:
+    - name: webui
+      port: 8080
+      targetPort: 8080
+      nodePort: 30081
+    - name: master
+      port: 7077
+      targetPort: 7077
+  selector:
+    app: spark
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spark
+spec:
+  serviceName: "spark"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark
+  template:
+    metadata:
+      labels:
+        app: spark
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: docker.io/library/busybox:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "chown -R 1001:1001 /opt/bitnami/spark/work"]
+          volumeMounts:
+            - name: spark-data
+              mountPath: /opt/bitnami/spark/work
+      containers:
+        - name: spark
+          image: docker.io/bitnami/spark:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPARK_MODE
+              value: "master"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+          volumeMounts:
+            - name: spark-data
+              mountPath: /opt/bitnami/spark/work
+      volumes:
+        - name: spark-data
+          hostPath:
+            path: /home/development/deployment/spark/work
+            type: DirectoryOrCreate
