@@ -40,7 +40,7 @@ spec:
               mountPath: /opt/bitnami/spark/work
       containers:
         - name: spark
-          image: docker.io/bitnami/spark:latest
+          image: docker.io/apache/spark:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: SPARK_MODE
@@ -58,6 +58,12 @@ spec:
           volumeMounts:
             - name: spark-data
               mountPath: /opt/bitnami/spark/work
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -e
+              echo "Spark container is ready."
+              sleep infinity
       volumes:
         - name: spark-data
           hostPath:

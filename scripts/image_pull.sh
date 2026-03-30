@@ -3,6 +3,7 @@ set -euo pipefail
 
 images=(
   "docker.io/apache/airflow:latest"
+  "docker.io/apache/spark:latest"
   "docker.io/prometheuscommunity/postgres-exporter:latest"
   "docker.io/prom/statsd-exporter:latest"
   "docker.io/prom/prometheus:latest"
@@ -11,7 +12,6 @@ images=(
   "docker.io/jenkins/jenkins:latest"
   "docker.io/library/postgres:latest"
   "docker.io/library/mongo:latest"
-  "docker.io/bitnami/spark:latest"
 )
 
 for image in "${images[@]}"; do
