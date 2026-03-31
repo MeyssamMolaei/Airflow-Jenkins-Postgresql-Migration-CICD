@@ -37,7 +37,7 @@ spec:
               while ! pg_isready -h postgres-p1 -p 5432 -U postgres; do sleep 5; done
               
               echo "⏳ Waiting for Postgres-P2 to be ready..."
-              while ! pg_isready -h postgres-p2 -p 5432 -U postgres; do sleep 5; done
+              #while ! pg_isready -h postgres-p2 -p 5432 -U postgres; do sleep 5; done
               
               echo "✅ Both databases are ready! Waiting an additional 30 seconds before deploying Airflow..."
               sleep 5
