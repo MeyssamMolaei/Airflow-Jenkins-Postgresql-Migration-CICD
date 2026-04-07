@@ -49,11 +49,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              chmod 777 /opt/airflow/dags
-              apt update
-              apt install -y python3-psycopg2 python3-pymongo
-              echo "root:qazwsx" | chpasswd
-              echo "airflow:qazwsx" | chpasswd
+              pip install --no-cache-dir psycopg2-binary pymongo
               airflow db reset --yes
               # airflow users create \
               #   --username madmin \

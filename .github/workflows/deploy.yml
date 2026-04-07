@@ -65,6 +65,9 @@ jobs:
             echo "⏳ Waiting for MongoDB to be ready..."
             kubectl rollout status statefulset/mongodb --timeout=120s
 
+            echo "🚀 Launching MongoDB Sharding Practice Playground..."
+            kubectl apply -f ~/deployment/kubernetes/mongo-sharding-practice.yaml
+
             kubectl apply -f ~/deployment/kubernetes/airflow.yaml
             echo "⏳ Waiting for Airflow to be ready..."
             kubectl rollout status statefulset/airflow --timeout=300s
