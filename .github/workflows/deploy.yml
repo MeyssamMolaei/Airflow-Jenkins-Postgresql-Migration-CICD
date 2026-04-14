@@ -57,11 +57,11 @@ jobs:
             echo "⏳ Waiting for Postgres-P1 to be ready..."
             kubectl rollout status statefulset/postgres-p1 --timeout=120s
 
-            kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml
+            kubectl apply -f ~/deployment/kubernetes/postgres-p2.yaml
             echo "⏳ Waiting for Postgres-P2 to be ready..."
             kubectl rollout status statefulset/postgres-p2 --timeout=120s
 
-            kubectl delete -f ~/deployment/kubernetes/mongodb.yaml
+            kubectl apply -f ~/deployment/kubernetes/mongodb.yaml
             echo "⏳ Waiting for MongoDB to be ready..."
             kubectl rollout status statefulset/mongodb --timeout=120s
 
@@ -72,11 +72,11 @@ jobs:
             echo "⏳ Waiting for Airflow to be ready..."
             kubectl rollout status statefulset/airflow --timeout=300s
 
-            kubectl delete -f ~/deployment/kubernetes/jenkins.yaml
+            kubectl apply -f ~/deployment/kubernetes/jenkins.yaml
             echo "⏳ Waiting for Jenkins to be ready..."
             kubectl rollout status statefulset/jenkins --timeout=300s
 
-            kubectl delete -f ~/deployment/kubernetes/grafana.yaml || true
+            kubectl apply -f ~/deployment/kubernetes/grafana.yaml || true
             echo "🗑️ Grafana deleted."
 
             kubectl apply -f ~/deployment/kubernetes/spark.yaml
