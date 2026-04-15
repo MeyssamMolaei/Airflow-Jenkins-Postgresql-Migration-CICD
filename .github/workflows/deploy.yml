@@ -53,33 +53,33 @@ jobs:
             ~/deployment/scripts/image_pull.sh
             kubectl get nodes
             # kubectl delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
-            kubectl apply -f ~/deployment/kubernetes/postgres-p1.yaml
+            kubectl delete -f ~/deployment/kubernetes/postgres-p1.yaml
             echo "⏳ Waiting for Postgres-P1 to be ready..."
             kubectl rollout status statefulset/postgres-p1 --timeout=120s
 
-            kubectl apply -f ~/deployment/kubernetes/postgres-p2.yaml
+            kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml
             echo "⏳ Waiting for Postgres-P2 to be ready..."
             kubectl rollout status statefulset/postgres-p2 --timeout=120s
 
-            kubectl apply -f ~/deployment/kubernetes/mongodb.yaml
+            kubectl delete -f ~/deployment/kubernetes/mongodb.yaml
             echo "⏳ Waiting for MongoDB to be ready..."
             kubectl rollout status statefulset/mongodb --timeout=120s
 
             echo "🚀 Launching MongoDB Sharding Practice Playground..."
             kubectl apply -f ~/deployment/kubernetes/mongo-sharding-practice.yaml
 
-            kubectl apply -f ~/deployment/kubernetes/airflow.yaml
+            kubectl delete -f ~/deployment/kubernetes/airflow.yaml
             echo "⏳ Waiting for Airflow to be ready..."
             kubectl rollout status statefulset/airflow --timeout=300s
 
-            kubectl apply -f ~/deployment/kubernetes/jenkins.yaml
+            kubectl delete -f ~/deployment/kubernetes/jenkins.yaml
             echo "⏳ Waiting for Jenkins to be ready..."
             kubectl rollout status statefulset/jenkins --timeout=300s
 
             kubectl apply -f ~/deployment/kubernetes/grafana.yaml || true
-            echo "🗑️ Grafana deleted."
+            echo "🗑️ Grafana created."
 
-            kubectl apply -f ~/deployment/kubernetes/spark.yaml
+            kubectl delete -f ~/deployment/kubernetes/spark.yaml
             echo "⏳ Waiting for Spark to be ready..."
             kubectl rollout status statefulset/spark --timeout=120s
 
@@ -90,5 +90,5 @@ jobs:
             kubectl apply -f ~/deployment/kubernetes/busybox.yaml
             echo "🚀 Waiting for Busybox to be ready..."
             kubectl rollout status statefulset/tools-pod --timeout=120s
-            # kubectl apply -f ~/deployment/kubernetes/datadog.yaml || true
+            # kubectl delete -f ~/deployment/kubernetes/datadog.yaml || true
 
