@@ -41,54 +41,38 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "🧹 Cleaning up existing resources..."
-            # Delete non-default resources in the current namespace
-            
-            # Wait a moment for cleanup to finish
-            sleep 5
+            echo "🧹 Cleaning up unused resources..."
+            kubectl delete -f ~/deployment/kubernetes/postgres-p1.yaml --ignore-not-found=true || true
+            kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml --ignore-not-found=true || true
+            kubectl delete -f ~/deployment/kubernetes/airflow.yaml --ignore-not-found=true || true
+            kubectl delete -f ~/deployment/kubernetes/jenkins.yaml --ignore-not-found=true || true
+            kubectl delete -f ~/deployment/kubernetes/spark.yaml --ignore-not-found=true || true
             
             echo "🚀 Deploying new manifests..."
             cd ~/deployment/kubernetes
             export KUBECONFIG=/home/development/.kube/config
             ~/deployment/scripts/image_pull.sh
             kubectl get nodes
-            # kubectl delete deployments,services,pods,configmaps,pvc,statefulsets --all --ignore-not-found=true --force            
-            kubectl delete -f ~/deployment/kubernetes/postgres-p1.yaml
-            echo "⏳ Waiting for Postgres-P1 to be ready..."
-            kubectl rollout status statefulset/postgres-p1 --timeout=120s
-
-            kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml
-            echo "⏳ Waiting for Postgres-P2 to be ready..."
-            kubectl rollout status statefulset/postgres-p2 --timeout=120s
-
+            
             kubectl apply -f ~/deployment/kubernetes/mongodb.yaml
             echo "⏳ Waiting for MongoDB to be ready..."
             kubectl rollout status statefulset/mongodb --timeout=120s
 
-            echo "🚀 Launching MongoDB Sharding Practice Playground..."
+            echo "🚀 Launching MongoDB Sharding Playground..."
             kubectl apply -f ~/deployment/kubernetes/mongo-sharding-practice.yaml
 
-            kubectl delete -f ~/deployment/kubernetes/airflow.yaml
-            echo "⏳ Waiting for Airflow to be ready..."
-            kubectl rollout status statefulset/airflow --timeout=300s
-
-            kubectl delete -f ~/deployment/kubernetes/jenkins.yaml
-            echo "⏳ Waiting for Jenkins to be ready..."
-            kubectl rollout status statefulset/jenkins --timeout=300s
-
-            kubectl apply -f ~/deployment/kubernetes/grafana.yaml || true
-            echo "🗑️ Grafana created."
-
-            kubectl delete -f ~/deployment/kubernetes/spark.yaml
-            echo "⏳ Waiting for Spark to be ready..."
-            kubectl rollout status statefulset/spark --timeout=120s
+            kubectl apply -f ~/deployment/kubernetes/grafana.yaml
+            echo "⏳ Waiting for Grafana..."
+            kubectl rollout status statefulset/grafana --timeout=120s
 
             echo "⏳ Applying monitoring exporters and integrations..."
-            kubectl delete -f ~/deployment/kubernetes/exporters.yaml
-            kubectl delete -f ~/deployment/kubernetes/prometheus.yaml
+            kubectl apply -f ~/deployment/kubernetes/exporters.yaml
+            kubectl apply -f ~/deployment/kubernetes/prometheus.yaml
+            
+            kubectl rollout status deployment/mongodb-exporter --timeout=120s
+            kubectl rollout status statefulset/prometheus --timeout=120s
 
             kubectl apply -f ~/deployment/kubernetes/busybox.yaml
             echo "🚀 Waiting for Busybox to be ready..."
             kubectl rollout status statefulset/tools-pod --timeout=120s
-            # kubectl delete -f ~/deployment/kubernetes/datadog.yaml || true
 
