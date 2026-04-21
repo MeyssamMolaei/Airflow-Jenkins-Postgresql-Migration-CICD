@@ -14,7 +14,7 @@ spec:
       hostNetwork: true
       containers:
         - name: node-exporter
-          image: prom/node-exporter:latest
+          image: docker.io/prom/node-exporter:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9100
@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
         - name: mongodb-exporter
-          image: percona/mongodb-exporter:0.39.0
+          image: docker.io/percona/mongodb-exporter:0.39.0
           imagePullPolicy: IfNotPresent
           env:
             - name: MONGODB_URI
