@@ -1,27 +1,26 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mongo-sharding
+# =========================================================
+# MongoDB Custom Sharding Practice Environment
+# Includes: Config Server, Mongos Router, and 2x Sharded Replica Sets (3 Pods Each)
+# ALL DEPLOYED TO THE DEFAULT NAMESPACE INLINE WITH CLUSTER DYNAMICS
+# =========================================================
+
+# 1️⃣ Config Server (Replica Set)
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo-configdb
-  namespace: mongo-sharding
 spec:
   clusterIP: None
+  ports:
+    - port: 27019
   selector:
     app: mongo-configdb
-  ports:
-    - name: mongo
-      port: 27019
-      targetPort: 27019
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongo-configdb
-  namespace: mongo-sharding
 spec:
   serviceName: mongo-configdb
   replicas: 1
@@ -33,60 +32,22 @@ spec:
       labels:
         app: mongo-configdb
     spec:
-      terminationGracePeriodSeconds: 30
       containers:
-        - name: mongodb
-          image: mongo:7.0
-          command:
-            - mongod
-            - --configsvr
-            - --replSet
-            - configRS
-            - --port
-            - "27019"
-            - --bind_ip_all
-            - --dbpath
-            - /data/db
-          ports:
-            - containerPort: 27019
-              name: mongo
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27019 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27019 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          volumeMounts:
-            - name: mongo-configdb-data
-              mountPath: /data/db
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "100m"
-  volumeClaimTemplates:
-    - metadata:
-        name: mongo-configdb-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
+      - name: mongodb
+        image: docker.io/library/mongo:latest
+        command: ["mongod", "--configsvr", "--replSet", "configRS", "--bind_ip_all"]
+        ports:
+        - containerPort: 27019
         resources:
           requests:
-            storage: 2Gi
+            memory: "128Mi"
+            cpu: "100m"
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-config-rs
-  namespace: mongo-sharding
 spec:
   backoffLimit: 10
   template:
@@ -99,12 +60,12 @@ spec:
             - sh
             - -c
             - |
-              until mongosh --host mongo-configdb-0.mongo-configdb.mongo-sharding.svc.cluster.local --port 27019 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-configdb-0.mongo-configdb.default.svc.cluster.local --port 27019 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for config server..."
                 sleep 5
               done
 
-              mongosh --host mongo-configdb-0.mongo-configdb.mongo-sharding.svc.cluster.local --port 27019 --quiet --eval '
+              mongosh --host mongo-configdb-0.mongo-configdb.default.svc.cluster.local --port 27019 --quiet --eval '
                 try {
                   rs.status()
                   print("configRS already initialized")
@@ -113,31 +74,29 @@ spec:
                     _id: "configRS",
                     configsvr: true,
                     members: [
-                      { _id: 0, host: "mongo-configdb-0.mongo-configdb.mongo-sharding.svc.cluster.local:27019" }
+                      { _id: 0, host: "mongo-configdb-0.mongo-configdb.default.svc.cluster.local:27019" }
                     ]
                   })
                 }
               '
+
+# 2️⃣ Shard 0 (Replica Set - 3 Pods)
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo-shard0
-  namespace: mongo-sharding
 spec:
   clusterIP: None
   selector:
     app: mongo-shard0
   ports:
-    - name: mongo
-      port: 27018
-      targetPort: 27018
+    - port: 27018
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongo-shard0
-  namespace: mongo-sharding
 spec:
   serviceName: mongo-shard0
   replicas: 3
@@ -149,60 +108,22 @@ spec:
       labels:
         app: mongo-shard0
     spec:
-      terminationGracePeriodSeconds: 30
       containers:
-        - name: mongodb
-          image: docker.io/library/mongo:latest
-          command:
-            - mongod
-            - --shardsvr
-            - --replSet
-            - shard0RS
-            - --port
-            - "27018"
-            - --bind_ip_all
-            - --dbpath
-            - /data/db
-          ports:
-            - containerPort: 27018
-              name: mongo
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27018 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27018 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          volumeMounts:
-            - name: mongo-shard0-data
-              mountPath: /data/db
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "200m"
-  volumeClaimTemplates:
-    - metadata:
-        name: mongo-shard0-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
+      - name: mongodb
+        image: docker.io/library/mongo:latest
+        command: ["mongod", "--shardsvr", "--replSet", "shard0RS", "--bind_ip_all"]
+        ports:
+        - containerPort: 27018
         resources:
           requests:
-            storage: 3Gi
+            memory: "256Mi"
+            cpu: "200m"
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-shard0-rs
-  namespace: mongo-sharding
 spec:
   backoffLimit: 10
   template:
@@ -215,22 +136,22 @@ spec:
             - sh
             - -c
             - |
-              until mongosh --host mongo-shard0-0.mongo-shard0.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard0-0.mongo-shard0.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard0-0..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard0-1.mongo-shard0.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard0-1.mongo-shard0.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard0-1..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard0-2.mongo-shard0.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard0-2.mongo-shard0.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard0-2..."
                 sleep 5
               done
 
-              mongosh --host mongo-shard0-0.mongo-shard0.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval '
+              mongosh --host mongo-shard0-0.mongo-shard0.default.svc.cluster.local --port 27018 --quiet --eval '
                 try {
                   rs.status()
                   print("shard0RS already initialized")
@@ -238,33 +159,31 @@ spec:
                   rs.initiate({
                     _id: "shard0RS",
                     members: [
-                      { _id: 0, host: "mongo-shard0-0.mongo-shard0.mongo-sharding.svc.cluster.local:27018" },
-                      { _id: 1, host: "mongo-shard0-1.mongo-shard0.mongo-sharding.svc.cluster.local:27018" },
-                      { _id: 2, host: "mongo-shard0-2.mongo-shard0.mongo-sharding.svc.cluster.local:27018" }
+                      { _id: 0, host: "mongo-shard0-0.mongo-shard0.default.svc.cluster.local:27018" },
+                      { _id: 1, host: "mongo-shard0-1.mongo-shard0.default.svc.cluster.local:27018" },
+                      { _id: 2, host: "mongo-shard0-2.mongo-shard0.default.svc.cluster.local:27018" }
                     ]
                   })
                 }
               '
+
+# 3️⃣ Shard 1 (Replica Set - 3 Pods)
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo-shard1
-  namespace: mongo-sharding
 spec:
   clusterIP: None
   selector:
     app: mongo-shard1
   ports:
-    - name: mongo
-      port: 27018
-      targetPort: 27018
+    - port: 27018
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongo-shard1
-  namespace: mongo-sharding
 spec:
   serviceName: mongo-shard1
   replicas: 3
@@ -276,60 +195,22 @@ spec:
       labels:
         app: mongo-shard1
     spec:
-      terminationGracePeriodSeconds: 30
       containers:
-        - name: mongodb
-          image: docker.io/library/mongo:latest
-          command:
-            - mongod
-            - --shardsvr
-            - --replSet
-            - shard1RS
-            - --port
-            - "27018"
-            - --bind_ip_all
-            - --dbpath
-            - /data/db
-          ports:
-            - containerPort: 27018
-              name: mongo
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27018 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27018 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          volumeMounts:
-            - name: mongo-shard1-data
-              mountPath: /data/db
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "200m"
-  volumeClaimTemplates:
-    - metadata:
-        name: mongo-shard1-data
-      spec:
-        accessModes: ["ReadWriteOnce"]
+      - name: mongodb
+        image: docker.io/library/mongo:latest
+        command: ["mongod", "--shardsvr", "--replSet", "shard1RS", "--bind_ip_all"]
+        ports:
+        - containerPort: 27018
         resources:
           requests:
-            storage: 3Gi
+            memory: "256Mi"
+            cpu: "200m"
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: init-shard1-rs
-  namespace: mongo-sharding
 spec:
   backoffLimit: 10
   template:
@@ -342,22 +223,22 @@ spec:
             - sh
             - -c
             - |
-              until mongosh --host mongo-shard1-0.mongo-shard1.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard1-0.mongo-shard1.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard1-0..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard1-1.mongo-shard1.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard1-1.mongo-shard1.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard1-1..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard1-2.mongo-shard1.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongo-shard1-2.mongo-shard1.default.svc.cluster.local --port 27018 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for shard1-2..."
                 sleep 5
               done
 
-              mongosh --host mongo-shard1-0.mongo-shard1.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval '
+              mongosh --host mongo-shard1-0.mongo-shard1.default.svc.cluster.local --port 27018 --quiet --eval '
                 try {
                   rs.status()
                   print("shard1RS already initialized")
@@ -365,26 +246,26 @@ spec:
                   rs.initiate({
                     _id: "shard1RS",
                     members: [
-                      { _id: 0, host: "mongo-shard1-0.mongo-shard1.mongo-sharding.svc.cluster.local:27018" },
-                      { _id: 1, host: "mongo-shard1-1.mongo-shard1.mongo-sharding.svc.cluster.local:27018" },
-                      { _id: 2, host: "mongo-shard1-2.mongo-shard1.mongo-sharding.svc.cluster.local:27018" }
+                      { _id: 0, host: "mongo-shard1-0.mongo-shard1.default.svc.cluster.local:27018" },
+                      { _id: 1, host: "mongo-shard1-1.mongo-shard1.default.svc.cluster.local:27018" },
+                      { _id: 2, host: "mongo-shard1-2.mongo-shard1.default.svc.cluster.local:27018" }
                     ]
                   })
                 }
               '
+
+# 4️⃣ Mongos Router Service
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongos
-  namespace: mongo-sharding
 spec:
   type: NodePort
   selector:
     app: mongos
   ports:
-    - name: mongo
-      port: 27017
+    - port: 27017
       targetPort: 27017
       nodePort: 30018
 ---
@@ -392,7 +273,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongos
-  namespace: mongo-sharding
 spec:
   replicas: 1
   selector:
@@ -404,44 +284,21 @@ spec:
         app: mongos
     spec:
       containers:
-        - name: mongos
-          image: docker.io/library/mongo:latest
-          command:
-            - mongos
-            - --configdb
-            - configRS/mongo-configdb-0.mongo-configdb.mongo-sharding.svc.cluster.local:27019
-            - --bind_ip_all
-            - --port
-            - "27017"
-          ports:
-            - containerPort: 27017
-              name: mongo
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27017 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - mongosh --port 27017 --quiet --eval "db.adminCommand('ping').ok"
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
+      - name: mongos
+        image: docker.io/library/mongo:latest
+        command: ["mongos", "--configdb", "configRS/mongo-configdb-0.mongo-configdb.default.svc.cluster.local:27019", "--bind_ip_all"]
+        ports:
+        - containerPort: 27017
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: add-shards
-  namespace: mongo-sharding
 spec:
   backoffLimit: 20
   template:
@@ -454,36 +311,35 @@ spec:
             - sh
             - -c
             - |
-              until mongosh --host mongos.mongo-sharding.svc.cluster.local --port 27017 --quiet --eval "db.adminCommand('ping').ok"; do
+              until mongosh --host mongos.default.svc.cluster.local --port 27017 --quiet --eval "db.adminCommand('ping').ok"; do
                 echo "waiting for mongos..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard0-0.mongo-shard0.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "rs.status().ok" >/dev/null 2>&1; do
+              until mongosh --host mongo-shard0-0.mongo-shard0.default.svc.cluster.local --port 27018 --quiet --eval "rs.status().ok" >/dev/null 2>&1; do
                 echo "waiting for shard0RS..."
                 sleep 5
               done
 
-              until mongosh --host mongo-shard1-0.mongo-shard1.mongo-sharding.svc.cluster.local --port 27018 --quiet --eval "rs.status().ok" >/dev/null 2>&1; do
+              until mongosh --host mongo-shard1-0.mongo-shard1.default.svc.cluster.local --port 27018 --quiet --eval "rs.status().ok" >/dev/null 2>&1; do
                 echo "waiting for shard1RS..."
                 sleep 5
               done
 
-              mongosh --host mongos.mongo-sharding.svc.cluster.local --port 27017 --quiet --eval '
+              mongosh --host mongos.default.svc.cluster.local --port 27017 --quiet --eval '
                 const s = sh.status()
                 const txt = JSON.stringify(s)
 
                 if (!txt.includes("shard0RS")) {
-                  sh.addShard("shard0RS/mongo-shard0-0.mongo-shard0.mongo-sharding.svc.cluster.local:27018,mongo-shard0-1.mongo-shard0.mongo-sharding.svc.cluster.local:27018,mongo-shard0-2.mongo-shard0.mongo-sharding.svc.cluster.local:27018")
+                  sh.addShard("shard0RS/mongo-shard0-0.mongo-shard0.default.svc.cluster.local:27018,mongo-shard0-1.mongo-shard0.default.svc.cluster.local:27018,mongo-shard0-2.mongo-shard0.default.svc.cluster.local:27018")
                 } else {
                   print("shard0RS already added")
                 }
 
                 if (!txt.includes("shard1RS")) {
-                  sh.addShard("shard1RS/mongo-shard1-0.mongo-shard1.mongo-sharding.svc.cluster.local:27018,mongo-shard1-1.mongo-shard1.mongo-sharding.svc.cluster.local:27018,mongo-shard1-2.mongo-shard1.mongo-sharding.svc.cluster.local:27018")
+                  sh.addShard("shard1RS/mongo-shard1-0.mongo-shard1.default.svc.cluster.local:27018,mongo-shard1-1.mongo-shard1.default.svc.cluster.local:27018,mongo-shard1-2.mongo-shard1.default.svc.cluster.local:27018")
                 } else {
                   print("shard1RS already added")
                 }
-
                 printjson(sh.status())
               '
