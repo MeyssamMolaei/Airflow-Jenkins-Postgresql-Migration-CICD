@@ -94,7 +94,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: init-config-rs
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - sh
             - -c
@@ -152,7 +152,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: mongodb
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - mongod
             - --shardsvr
@@ -210,7 +210,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: init-shard0-rs
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - sh
             - -c
@@ -279,7 +279,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: mongodb
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - mongod
             - --shardsvr
@@ -337,7 +337,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: init-shard1-rs
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - sh
             - -c
@@ -405,7 +405,7 @@ spec:
     spec:
       containers:
         - name: mongos
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - mongos
             - --configdb
@@ -449,7 +449,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: add-shards
-          image: mongo:7.0
+          image: docker.io/library/mongo:latest
           command:
             - sh
             - -c
