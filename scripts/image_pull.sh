@@ -13,7 +13,7 @@ images=(
   "docker.io/library/postgres:latest"
   "docker.io/library/mongo:latest"
   "docker.io/prom/node-exporter:latest"
-  "docker.io/percona/mongodb-exporter:0.39.0"
+  "docker.io/percona/mongodb_exporter:0.50.0"
 )
 
 for image in "${images[@]}"; do

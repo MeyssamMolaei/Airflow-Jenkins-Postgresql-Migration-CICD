@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
         - name: mongodb-exporter
-          image: docker.io/percona/mongodb-exporter:0.39.0
+          image: docker.io/percona/mongodb_exporter:0.50.0
           imagePullPolicy: IfNotPresent
           env:
             - name: MONGODB_URI
