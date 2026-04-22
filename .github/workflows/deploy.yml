@@ -42,11 +42,11 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             echo "🧹 Cleaning up unused resources..."
-            kubectl delete -f ~/deployment/kubernetes/postgres-p1.yaml --ignore-not-found=true || true
-            kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml --ignore-not-found=true || true
-            kubectl delete -f ~/deployment/kubernetes/airflow.yaml --ignore-not-found=true || true
-            kubectl delete -f ~/deployment/kubernetes/jenkins.yaml --ignore-not-found=true || true
-            kubectl delete -f ~/deployment/kubernetes/spark.yaml --ignore-not-found=true || true
+            # kubectl delete -f ~/deployment/kubernetes/postgres-p1.yaml --ignore-not-found=true || true
+            # kubectl delete -f ~/deployment/kubernetes/postgres-p2.yaml --ignore-not-found=true || true
+            # kubectl delete -f ~/deployment/kubernetes/airflow.yaml --ignore-not-found=true || true
+            # kubectl delete -f ~/deployment/kubernetes/jenkins.yaml --ignore-not-found=true || true
+            # kubectl delete -f ~/deployment/kubernetes/spark.yaml --ignore-not-found=true || true
             
             echo "🚀 Deploying new manifests..."
             cd ~/deployment/kubernetes
